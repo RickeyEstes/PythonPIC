@@ -69,7 +69,7 @@ def test_wave_propagation(wave_propagation_helper):
 
 def test_polarization_orthogonality(wave_propagation_helper):
     run, laser = wave_propagation_helper
-    angles = ((run.grid.electric_field_history * run.grid.magnetic_field_history).sum(axis=(1, 2)))
+    angles = ((run.grid.electric_field_history[...] * run.grid.magnetic_field_history[...]).sum(axis=(1, 2)))
     assert np.isclose(angles, 0).all(), "Polarization is not orthogonal!"
 
 

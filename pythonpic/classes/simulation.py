@@ -163,7 +163,12 @@ class Simulation:
 
     def test_run(self):
         """Does a blind run without saving data, for test purposes."""
-        return self.run().postprocess()
+        try:
+            os.remove(self.filename)
+        except FileNotFoundError:
+            pass
+        result = self.run().postprocess()
+        return result
 
 
     def save_data(self):

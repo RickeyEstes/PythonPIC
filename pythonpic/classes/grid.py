@@ -101,33 +101,46 @@ class Grid:
                            'NT': self.NT,
                            'T': self.T,
                            'periodic': self.periodic,
-                           'postprocessed': self.postprocessed
+                           'postprocessed': self.postprocessed,
+                           'postprocessed_fourier': self.postprocessed_fourier
                            }
         for key, value in h5py_dictionary.items():
             group.attrs[key] = value
 
 
     def postprocess_fourier(self):
-        if not self.postprocessed_fourier:
-            self.longitudinal_energy_history  = 0.5 * self.epsilon_0 * (self.electric_field_history[:,:,0] ** 2)
+        group = self.file['grid']
+        if not group.attrs["postprocessed_fourier"]:
+            self.longitudinal_energy_history  = group.create_dataset("longitudinal_energy", data=0.5 * self.epsilon_0 * (self.electric_field_history[:,:,0] ** 2))
             perpendicular_electric_energy = 0.5 * self.epsilon_0 * (self.electric_field_history[:,:,1:] ** 2).sum(2) # over directions
             mu_zero_inv = 1/ (self.epsilon_0 * self.c**2)
-            magnetic_energy = 0.5 * (self.magnetic_field_history **2).sum(2) * mu_zero_inv # over directions
+            magnetic_energy = 0.5 * (self.magnetic_field_history[...] **2).sum(2) * mu_zero_inv # over directions
 
-            self.perpendicular_energy_history = perpendicular_electric_energy + magnetic_energy
-            self.check_on_charge = np.gradient(self.electric_field_history[:, :, 0], self.dx, axis=1) * self.epsilon_0
+            self.perpendicular_energy_history = group.create_dataset("perpendicular_energy", data=perpendicular_electric_energy + magnetic_energy)
+            self.check_on_charge = group.create_dataset("charge_test", data=np.gradient(self.electric_field_history[:, :, 0], self.dx, axis=1) * self.epsilon_0)
             # fourier analysis
             from scipy import fftpack
-            self.k_plot = fftpack.rfftfreq(int(self.NG), self.dx)[::2]
-            self.longitudinal_energy_per_mode_history = np.abs(fftpack.rfft(self.longitudinal_energy_history))[:,::2]
-            self.perpendicular_energy_per_mode_history = np.abs(fftpack.rfft(self.perpendicular_energy_history))[:,::2]
+            self.k_plot = group.create_dataset("k_plot", data=fftpack.rfftfreq(int(self.NG), self.dx)[::2])
+            self.longitudinal_energy_per_mode_history = group.create_dataset("longitudinal_fourier", data=np.abs(fftpack.rfft(self.longitudinal_energy_history))[:,::2])
+            self.perpendicular_energy_per_mode_history = group.create_dataset("perpendicular_fourier", data=np.abs(fftpack.rfft(self.perpendicular_energy_history))[:,::2])
 
-            self.longitudinal_energy_history  = self.longitudinal_energy_history.sum(1)
-            self.perpendicular_energy_history = self.perpendicular_energy_history.sum(1)
-            self.grid_energy_history = self.perpendicular_energy_history + self.longitudinal_energy_history # over positions
+            self.longitudinal_energy_history  = group.create_dataset("total_longitudinal", data=self.longitudinal_energy_history[...].sum(1))
+            self.perpendicular_energy_history = group.create_dataset("total_perpendicular", data=self.perpendicular_energy_history[...].sum(1))
+            self.grid_energy_history = group.create_dataset("total_grid", data=self.perpendicular_energy_history[...] + self.longitudinal_energy_history[...])
+            group.attrs["postprocessed_fourier"] = True
             self.postprocessed_fourier = True
+            self.file.flush()
+        else:
+            self.perpendicular_energy_history = group["perpendicular_energy"]
+            self.check_on_charge = group["charge_test"]
+            self.k_plot = group["k_plot"]
+            self.longitudinal_energy_per_mode_history = group["longitudinal_fourier"]
+            self.perpendicular_energy_history = group["perpendicular_fourier"]
+            self.longitudinal_energy_history = group["total_longitudinal"]
+            self.perpendicular_energy_history = group["total_perpendicular"]
+            self.grid_energy_history = group["total_grid"]
 
-    def postprocess(self, fourier=False):
+    def postprocess(self, fourier=True):
         group = self.file['grid']
         if not self.postprocessed:
             print("Postprocessing grid.")
@@ -289,3 +302,4 @@ class TestGrid(Grid):
             np.cumsum(self.laser_energy_history**2/ vacuum_wave_impedance * self.dt)
             self.x_current = self.x + self.dx / 2
             self.postprocessed = True
+

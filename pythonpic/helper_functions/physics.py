@@ -53,7 +53,7 @@ def get_dominant_mode(S):
     :rtype: int
     """
     S.grid.postprocess_fourier()
-    data = S.grid.longitudinal_energy_per_mode_history
+    data = S.grid.longitudinal_energy_per_mode_history[...]
     weights = (data ** 2).sum(axis=0) / (data ** 2).sum()
 
     max_mode = weights[1:].argmax()+1

@@ -186,7 +186,6 @@ class FastAnimation(animation):
 class OneDimAnimation(animation):
     def __init__(self, S, alpha=0.6, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
-        self.S.grid.postprocess_fourier()
         density_axis = self.fig.add_subplot(321)
         charge_axis = self.fig.add_subplot(323)
 

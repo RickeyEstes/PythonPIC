@@ -73,7 +73,7 @@ class FrequencyPlot(Plot):
         self.plots.append(self.ax.plot([], [], "o-", label="energy per mode")[0])
         self.ax.set_xlabel(r"Wavevector mode $k$")
         self.ax.set_ylabel(r"Energy $E$")
-        max_interesting = S.grid.k_plot.max() * 0.3
+        max_interesting = S.grid.k_plot[...].max() * 0.3
         # self.indices = S.grid.k_plot <  max_interesting
         self.indices = np.ones_like(S.grid.k_plot, dtype=bool)
         interesting_x = S.grid.k_plot[self.indices]

@@ -119,7 +119,7 @@ def test_PoissonSolver_energy_sine(_NG, ):
 
     g.init_solver()
     g.save_field_values(0)
-    g.postprocess_fourier()
+    g.postprocess()
     energy_fourier = g.grid_energy_history[0]
     energy_direct = g.direct_energy_calculation()
     print("dx", dx, "fourier", energy_fourier, "direct", energy_direct, energy_fourier / energy_direct)
