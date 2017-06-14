@@ -11,7 +11,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
-VERSION = 23
+VERSION = 24
 laser_wavelength = 1.064e-6 # meters
 laser_intensity = 1e23 # watt/meters squared
 impulse_duration = 1e-13 # seconds
@@ -38,8 +38,7 @@ npic = 0.01 * critical_density(laser_wavelength)
 N_MACROPARTICLES = int(maximum_electron_concentration * 1.5 * preplasma_length / npic / spatial_step)
 print(N_MACROPARTICLES)
 n_macroparticles = N_MACROPARTICLES
-scaling = npic# CHECK what should be the proper value here?
-default_scaling = npic # CHECK what should be the proper value here?
+scaling = 2*npic# CHECK what should be the proper value here?
 
 category_name = "laser-shield"
 # assert False
@@ -84,7 +83,7 @@ class laser(Simulation):
 
         if n_macroparticles:
             electrons = Species(-electric_charge, electron_rest_mass, n_macroparticles, grid, "electrons", scaling)
-            electrons.random_velocity_init(vtherm)
+            # electrons.random_velocity_init(vtherm)
             protons = Species(electric_charge, proton_mass, n_macroparticles, grid, "protons", scaling)
             list_species = [electrons, protons]
         else:
@@ -106,7 +105,6 @@ class laser(Simulation):
         for species in self.list_species:
             print(f"Distributing {species.name} nonuniformly.")
             species.distribute_nonuniformly(length, moat_length_left_side, preplasma_length, main_plasma_length)
-            species.random_position_perturbation(self.perturbation_amplitude)
         print("Finished initial distribution of particles.")
         super().grid_species_initialization()
         print("Finished initialization.")

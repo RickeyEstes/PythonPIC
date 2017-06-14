@@ -92,7 +92,7 @@ def rela_boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
     uprime = v + np.cross(v, t)
     # rotate second time, by s = 2t/(1+t*t)
     t *= 2
-    t /= (1 + t * t).sum(axis=1, keepdims=True)
+    t /= 1 + (t * t).sum(axis=1, keepdims=True)
     # u+ = u- + u' x s
     v += np.cross(uprime, t)
 

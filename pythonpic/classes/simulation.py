@@ -132,10 +132,8 @@ class Simulation:
             return self
         except KeyboardInterrupt:
             self.grid_file.close()
-            print("Simulation interrupted. Remove data? y to remove.")
-            if "y" == input().lower():
-                os.remove(self.filename)
-                print("Deleted file.")
+            print("Simulation interrupted. Removing data.")
+            os.remove(self.filename)
             exit()
 
     def lazy_run(self):

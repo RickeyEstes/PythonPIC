@@ -148,7 +148,7 @@ class Grid:
             if fourier:
                 self.postprocess_fourier()
             vacuum_wave_impedance= 1/ (self.epsilon_0 * self.c)
-            np.cumsum(self.laser_energy_history[...]**2/ vacuum_wave_impedance * self.dt, out=self.laser_energy_history[...])
+            self.laser_energy_history[...] = np.cumsum(self.laser_energy_history[...]**2/ vacuum_wave_impedance * self.dt)
             self.x_current = group.create_dataset(name="x_current", data=self.x + self.dx / 2)
             self.postprocessed = True
             group.attrs['postprocessed'] = True

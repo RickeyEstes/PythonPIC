@@ -63,7 +63,7 @@ def test_amplitude(wave_propagation_helper):
 
 def test_wave_propagation(wave_propagation_helper):
     run, laser = wave_propagation_helper
-    mean_energy = run.grid.grid_energy_history.mean()
+    mean_energy = run.grid.grid_energy_history[...].mean()
     assert mean_energy, plots(run, *on_failure)
 
 

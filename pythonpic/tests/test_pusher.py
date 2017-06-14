@@ -119,18 +119,18 @@ def test_relativistic_magnetic_field(g, _N_particles, _v0):
     def uniform_magnetic_field(x):
         return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, B0]], dtype=float)
 
-    gamma = physics.gamma_from_v(s.v, s.c)[0]
+    gamma = physics.gamma_from_v(s.v, s.c)[0,0]
     vy_analytical = _v0 * np.cos(s.q * B0 * (t - g.dt / 2) / (s.m * gamma))
 
     s.init_push(uniform_magnetic_field)
     for i in range(g.NT):
         s.save_particle_values(i)
         s.push(uniform_magnetic_field)
-    assert (s.velocity_history < 1).all(), plot(t, vy_analytical, s.velocity_history[:, 0, 1],
+    assert (s.velocity_history < g.c).all(), plot(t, vy_analytical, s.velocity_history[:, 0, 1],
                                                 f"Velocity went over c! Max velocity: {s.velocity_history.max()}")
     assert np.allclose(s.kinetic_energy_history[1:-1], s.kinetic_energy_history[1:-1].mean(), atol=atol, rtol=rtol), "Energy is off!"
-    assert np.allclose(s.velocity_history[:, 0, 1], vy_analytical, atol=atol, rtol=rtol), \
-        plot(t, vy_analytical, s.velocity_history[:, 0, 1], )
+
+    assert np.allclose(s.velocity_history[:, 0, 1], vy_analytical, atol=atol, rtol=rtol)
 
 
 # noinspection PyUnresolvedReferences
@@ -273,7 +273,7 @@ def test_nonperiodic_particles(g_aperiodic):
 #      assert False, plots(sim, show_animation=True, show_static=True, animation_type=animation.OneDimAnimation, frames="all")
 
 def test_laser_pusher():
-    S = laser("test_current", 0, 0, 0, 0)
+    S = laser("test_current", 0, 1378, 0, 0, 0)
     p = Particle(S.grid,
                  9.45*S.grid.dx,
                  0,
