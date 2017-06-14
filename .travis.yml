@@ -19,7 +19,7 @@ install:
   - python setup.py install
 
 script:
-  - coverage run -m pytest pythonpic
+  - coverage run -m pytest pythonpic/tests
 
 after_success:
   - coveralls

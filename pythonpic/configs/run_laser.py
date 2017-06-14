@@ -11,7 +11,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
-VERSION = 24
+VERSION = 26
 laser_wavelength = 1.064e-6 # meters
 laser_intensity = 1e23 # watt/meters squared
 impulse_duration = 1e-13 # seconds

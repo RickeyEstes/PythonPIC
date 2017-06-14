@@ -50,7 +50,7 @@ def wave_propagation_helper(shape, intensity, wavelength, power):
     laser = BoundaryCondition.Laser(intensity, wavelength, 10, power)
     bc = shape(laser)
     filename = f"wave_propagation_test_I{intensity}L{wavelength}P{power}"
-    sim = wave_propagation(filename, bc).run().postprocess()
+    sim = wave_propagation(filename, bc).test_run()
     return sim, laser
 
 

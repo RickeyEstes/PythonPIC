@@ -80,7 +80,7 @@ class FrequencyPlot(Plot):
         self.ax.set_xticks(interesting_x)
         self.ax.xaxis.set_ticklabels(np.arange(len(interesting_x)))
         self.ax.set_xlim(interesting_x.min(), interesting_x.max())
-        self.ax.set_ylim(0, max(S.grid.longitudinal_energy_per_mode_history[...]))
+        self.ax.set_ylim(0, S.grid.longitudinal_energy_per_mode_history[...].max())
 
     def update(self, i):
         # import ipdb; ipdb.set_trace()
