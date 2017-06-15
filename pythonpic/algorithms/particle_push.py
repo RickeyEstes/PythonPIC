@@ -132,8 +132,7 @@ def boris_push(species, E: np.ndarray, dt: float, B: np.ndarray):
     """
     energy = boris_velocity_kick(species.v, species.c, species.eff_q,
                                       E, B, dt, species.eff_m)
-    new_x = species.x + species.v[:, 0] * dt
-    return new_x, species.v, energy
+    return energy
 def rela_boris_push(species, E: np.ndarray, dt: float, B: np.ndarray):
     """
     Implements the relativistic Boris pusher.
@@ -161,6 +160,5 @@ def rela_boris_push(species, E: np.ndarray, dt: float, B: np.ndarray):
     """
     energy = rela_boris_velocity_kick(species.v, species.c, species.eff_q,
                                       E, B, dt, species.eff_m)
-    new_x = species.x + species.v[:, 0] * dt
-    return new_x, species.v, energy
+    return energy
 

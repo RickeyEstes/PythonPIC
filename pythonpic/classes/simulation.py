@@ -64,12 +64,15 @@ class Simulation:
         2. solves Poisson equation to get initial field
         3. initializes pusher via a step back
         """
+        self.grid.apply_bc(0)
+        for species in self.list_species:
+            species.velocity_push(self.grid.field_function, -0.5)
         self.grid.gather_charge(self.list_species)
         self.grid.gather_current(self.list_species)
         self.grid.init_solver()
-        self.grid.apply_bc(0)
         for species in self.list_species:
-            species.init_push(self.grid.field_function)
+            species.position_push()
+            species.apply_bc()
         return self
 
     def iteration(self, i: int, periodic: bool = True):
@@ -86,15 +89,16 @@ class Simulation:
 
         """
         self.grid.save_field_values(i)  # CHECK: is this the right place, or after loop?
-
-        for species in self.list_species:
-            species.save_particle_values(i)
-            species.push(self.grid.field_function)
-            species.apply_bc()
         self.grid.apply_bc(i)
+        for species in self.list_species:
+            species.velocity_push(self.grid.field_function)
         self.grid.gather_charge(self.list_species)
         self.grid.gather_current(self.list_species)
         self.grid.solve()
+        for species in self.list_species:
+            species.position_push()
+            species.save_particle_values(i)
+            species.apply_bc()
 
     def run(self, init=True) -> float:
         """

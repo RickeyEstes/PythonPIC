@@ -78,10 +78,11 @@ def test_constant_field(g, _pusher, _N_particles):
         return np.array([[1, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
     x_analytical = 0.5 * (t + g.dt / 2) ** 2 + 0
-    s.init_push(uniform_field)
+    s.velocity_push(uniform_field, -0.5)
     for i in range(g.NT):
         s.save_particle_values(i)
-        s.push(uniform_field)
+        s.velocity_push(uniform_field)
+        s.position_push()
 
     s.save_particle_values(g.NT-1)
     assert np.allclose(s.position_history[:, 0], x_analytical, atol=atol, rtol=rtol), \
@@ -97,10 +98,11 @@ def test_relativistic_constant_field(g, _N_particles):
         return np.array([[1, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
     v_analytical = (t - g.dt / 2) / np.sqrt((t - g.dt / 2) ** 2 + 1)
-    s.init_push(uniform_field)
+    s.velocity_push(uniform_field, -0.5)
     for i in range(g.NT):
         s.save_particle_values(i)
-        s.push(uniform_field)
+        s.velocity_push(uniform_field)
+        s.position_push()
 
     s.save_particle_values(g.NT-1)
     assert (s.velocity_history < 1).all(), plot(t, v_analytical, s.velocity_history[:, 0, 0],
@@ -122,10 +124,11 @@ def test_relativistic_magnetic_field(g, _N_particles, _v0):
     gamma = physics.gamma_from_v(s.v, s.c)[0,0]
     vy_analytical = _v0 * np.cos(s.q * B0 * (t - g.dt / 2) / (s.m * gamma))
 
-    s.init_push(uniform_magnetic_field)
+    s.velocity_push(uniform_magnetic_field, 0.5)
     for i in range(g.NT):
         s.save_particle_values(i)
-        s.push(uniform_magnetic_field)
+        s.velocity_push(uniform_magnetic_field)
+        s.position_push()
     assert (s.velocity_history < g.c).all(), plot(t, vy_analytical, s.velocity_history[:, 0, 1],
                                                 f"Velocity went over c! Max velocity: {s.velocity_history.max()}")
     assert np.allclose(s.kinetic_energy_history[1:-1], s.kinetic_energy_history[1:-1].mean(), atol=atol, rtol=rtol), "Energy is off!"
@@ -148,10 +151,11 @@ def test_relativistic_harmonic_oscillator(g, _N_particles, E0):
     def electric_field(x, t):
         return np.array([[1, 0, 0]], dtype=float) * E0 * np.cos(omega * t), np.array([[0, 0, 0]], dtype=float)
 
-    s.init_push(lambda x: electric_field(x, 0))
+    s.velocity_push(lambda x: electric_field(x, 0), 0.5)
     for i in range(g.NT):
         s.save_particle_values(i)
-        s.push(lambda x: electric_field(x, i * g.dt))
+        s.velocity_push(lambda x: electric_field(x, i * g.dt))
+        s.position_push()
 
     s.save_particle_values(g.NT-1)
     assert (s.velocity_history < 1).all(), plot(t, v_analytical, s.velocity_history[:, 0, 0],
@@ -176,9 +180,9 @@ def no_field(x):
     ])
 def test_kinetic_energy(g, v0, expected_kin, _N_particles):
     s = Particle(g, 0, v0, scaling=_N_particles)
-    energy = s.push(no_field)
+    energy = s.velocity_push(no_field)
     total_expected_kin = expected_kin * _N_particles * s.dt * g.c**2
-    assert np.isclose(total_expected_kin, energy)
+    assert np.isclose(total_expected_kin, s.energy)
 
 
 
@@ -193,10 +197,11 @@ def test_high_relativistic_velocity(g, v0):
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
 
-    s.init_push(lambda x: no_field(x))
+    s.velocity_push(lambda x: no_field(x), -0.5)
     for i in range(g.NT):
         s.save_particle_values(i)
-        s.push(lambda x: no_field(x))
+        s.velocity_push(lambda x: no_field(x))
+        s.position_push()
 
     s.save_particle_values(g.NT-1)
     frac = np.sqrt(np.sum(s.v**2)) * s.dt
@@ -213,10 +218,11 @@ def test_high_relativistic_velocity_multidirection(g, v0):
     def no_field(x):
         return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
-    s.init_push(lambda x: no_field(x))
+    s.velocity_push(lambda x: no_field(x), -0.5)
     for i in range(g.NT):
         s.save_particle_values(i)
-        s.push(lambda x: no_field(x))
+        s.velocity_push(lambda x: no_field(x))
+        s.position_push()
 
     s.save_particle_values(g.NT-1)
     assert np.allclose(s.kinetic_energy_history[1:-1], s.kinetic_energy_history[1:-1].mean(), atol=atol, rtol=rtol), "Energy is off!"
@@ -228,7 +234,8 @@ def test_periodic_particles(g):
     s.v[:] = 0.5
     for i in range(g.NT):
         force = lambda x: (np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float))
-        s.push(force)
+        s.velocity_push(force)
+        s.position_push()
         s.apply_bc()
     assert s.N_alive == s.N, "They're dead, Jim."
 
@@ -239,7 +246,8 @@ def test_nonperiodic_particles(g_aperiodic):
     s.v[:] = 0.5
     for i in range(g.NT):
         force = lambda x: (np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float))
-        s.push(force)
+        s.velocity_push(force)
+        s.position_push()
         s.apply_bc()
     assert s.N_alive == 0
 
@@ -284,7 +292,8 @@ def test_laser_pusher():
     S.grid.list_species = [p]
     Ev, Bv = (np.array([[0, 1.228e12, 0]]), np.array([[0,0,4.027e3]]))
     E = lambda x: (Ev, Bv)
-    p.push(E)
+    p.velocity_push(E)
+    p.position_push()
     print(p.v)
     expected_u = np.array([[5.089e4, -5.5698e6, 0]]) # this is u!
     expected_v = expected_u #* gamma_from_u(expected_u, S.grid.c)

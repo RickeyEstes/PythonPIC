@@ -139,27 +139,12 @@ class Species:
         total_vel *= self.gamma -1
         return total_vel.sum() * self.dt * self.eff_m * self.c**2
 
-    def init_push(self, field_function):
-        """
-        Push the particles using the previously set pushing algorithm.
-        This is the same thing as seen in `push`, except that it doesn't update positions.
-        That is necessary for energy conservation purposes of Boris and Leapfrog pushers.
-
-        Parameters
-        ----------
-        electric_field_function : ndarray
-        magnetic_field_function : ndarray
-            Arrays of interpolated field values. Shape should be (N_particles, 3).
-
-        Returns
-        -------
-
-        The kinetic energy of the particles, calculated at half timestep.
-        """
-
+    def velocity_push(self, field_function, time_multiplier=1):
         E, B = field_function(self.x)
-        _, self.v, self.energy = self.pusher(self, E, -self.dt * 0.5, B)
-        return self.energy
+        self.energy = self.pusher(self, E, time_multiplier * self.dt, B)
+
+    def position_push(self):
+        self.x += self.v[:, 0] * self.dt
 
     def push(self, field_function):
         """
