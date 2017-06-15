@@ -52,7 +52,9 @@ def report_progress(i: int, NT: int, beginning_time = None):
         Current iteration number
     NT : int
         Total iteration number
-
+    beginning_time : `float` or `bool`
+        `time.time()`-generated runtime at beginning of simulation instance.
+        Used for estimating runtime. Default is `None`.
     Examples
     ----------
     >>> report_progress(0, 128)

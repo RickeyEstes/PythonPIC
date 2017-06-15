@@ -1,14 +1,16 @@
-"""Implements interaction of the laser with a hydrogen shield plasma"""
 # coding=utf-8
-import numpy as np
-from pythonpic.algorithms import BoundaryCondition
-from pythonpic.classes import Grid, Simulation, Species
-from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, lightspeed, proton_mass, electron_rest_mass, \
-    critical_density, cold_plasma_frequency
-
+"""Implements interaction of the laser with a hydrogen shield plasma"""
 from functools import partial
-from pythonpic.visualization.plotting import plots
+
+import numpy as np
+
+from pythonpic.classes import Grid, Simulation, Species
+from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, lightspeed, proton_mass, \
+    electron_rest_mass, \
+    critical_density, cold_plasma_frequency
 from pythonpic.visualization import animation
+from pythonpic.visualization.plotting import plots
+
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
 VERSION = 23
@@ -51,12 +53,8 @@ class uniform(Simulation):
         n_macroparticles : int
             Number of macroparticles for each species. The simulation is
             normalized to 75000 macroparticles by default,
-        impulse_duration : float
-            Duration of the laser impulse.
-        laser_intensity : float
-            Laser impulse intensity, in W/m^2. A good default is 1e21.
-        perturbation_amplitude : float
-            Amplitude of the initial position perturbation.
+        n_cells : int
+            Number of grid cells.
         """
         grid = Grid(T=total_time, L=length, NG=int(n_cells), c =lightspeed, epsilon_0 =epsilon_zero, periodic=True)
 

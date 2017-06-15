@@ -35,7 +35,7 @@ def static_plot_window(S, N, M):
     return fig, axes
 
 
-# REFACTOR: turn these into classes like in animation
+# REFACTOR: turn these into classes like in Animation
 def ESE_time_plots(S, axis):
     data = S.grid.longitudinal_energy_per_mode_history
     # wavelengths = 2 * np.pi / S.grid.k_plot

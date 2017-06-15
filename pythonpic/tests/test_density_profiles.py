@@ -21,7 +21,7 @@ def _fraction(request):
 _second_fraction = _fraction
 
 @pytest.fixture(params=np.linspace(300, 4000, 3, dtype=int), scope='module')
-def _N(request):
+def _N_particles(request):
     return request.param
 
 @pytest.fixture(params=density_profiles.profiles.keys(), scope='module')
@@ -30,10 +30,10 @@ def _profile(request):
 
 # noinspection PyUnresolvedReferences
 @pytest.fixture()
-def test_density_helper(_fraction, _second_fraction, _profile, _N):
+def test_density_helper(_fraction, _second_fraction, _profile, _N_particles):
 
     g = Grid(1, 100, 100)
-    s = Species(1, 1, _N, g)
+    s = Species(1, 1, _N_particles, g)
 
     moat_length = g.L * _fraction
     ramp_length = g.L * _second_fraction

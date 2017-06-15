@@ -449,7 +449,7 @@ def test_longitudinal_current_multiples_as_species(paramset):
     spec.v[:,0] = init_vx
     S.grid.list_species = [spec]
     S.grid.gather_current([spec])
-    investigated_density = S.grid.current_density_x[9:13] / (spec.eff_q)
+    investigated_density = S.grid.current_density_x[9:13] / spec.eff_q
 
     error = (investigated_density - expected_density) /expected_density * 100
     error[(investigated_density - expected_density) == 0] = 0

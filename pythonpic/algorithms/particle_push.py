@@ -4,7 +4,7 @@ import numpy as np
 from numba import jit
 
 @jit()
-def boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
+def boris_velocity_kick(v, eff_q, E, B, dt, eff_m):
     """
     The velocity update portion of the Boris pusher. Updates the velocity in place so as to conserve memory.
 
@@ -12,8 +12,6 @@ def boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
     ----------
     v : `numpy.ndarray`
         Array of velocities, of shape `(N, 3)`, `N` being the number of macroparticles
-    c : `float`
-        The speed of light
     eff_q : `float`
         The effective charge of the particles (total charge in the macroparticle)
     E : `numpy.ndarray`
@@ -130,8 +128,8 @@ def boris_push(species, E: np.ndarray, dt: float, B: np.ndarray):
     `float`
         Total kinetic energy of the particles.
     """
-    energy = boris_velocity_kick(species.v, species.c, species.eff_q,
-                                      E, B, dt, species.eff_m)
+    energy = boris_velocity_kick(species.v, species.eff_q,
+                                 E, B, dt, species.eff_m)
     return energy
 def rela_boris_push(species, E: np.ndarray, dt: float, B: np.ndarray):
     """

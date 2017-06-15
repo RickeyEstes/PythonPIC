@@ -33,7 +33,7 @@ def test_static_plots(helper_short_simulation):
 # def test_animation(helper_short_simulation):
 #     S = helper_short_simulation
 #     if S:
-#         animation.OneDimAnimation(S).full_animation(True)
+#         Animation.OneDimAnimation(S).full_animation(True)
 #         assert True
 
 
@@ -54,7 +54,7 @@ def test_writer_manual_speed(helper_short_simulation):
 # def test_writer_speed(helper_short_simulation, writer):
 #     S = helper_short_simulation
 #     start_time = time()
-#     animation(S, save=True, writer=writer)
+#     Animation(S, save=True, writer=writer)
 #     endtime = time()
 #     runtime = endtime - start_time
 #     print(writer, runtime)

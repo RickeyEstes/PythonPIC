@@ -215,18 +215,16 @@ class Grid:
 
 
     def __str__(self):
-        return(f"NG{self.NG} dx{self.dx} NT {self.NT} dt {self.dt} c{self.c}eps{self.epsilon_0}")
+        return f"NG{self.NG} dx{self.dx} NT {self.NT} dt {self.dt} c{self.c}eps{self.epsilon_0}"
 
-def load_grid(file, postprocess=False):
+def load_grid(file):
     """
     Loads grid data and create a Grid object.
 
     Parameters
     ----------
-    grid_data : h5py path
-        Path to Grid data.
-    postprocess: bool
-        Whether to postprocess the grid after loading.
+    file : h5py.File
+        h5py file with data
     Returns
     -------
     Grid

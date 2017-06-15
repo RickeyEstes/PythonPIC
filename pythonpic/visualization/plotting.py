@@ -35,6 +35,9 @@ def plots(file,
     snapshot_animation : bool
     alpha : float
         Used for opacity in plots
+    animation_type : `pythonpic.visualization.Animation`
+    frames : str
+        see docs of `pythonpic.visualization.Animation`
 
     Returns
     -------

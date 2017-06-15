@@ -13,7 +13,7 @@ from ..helper_functions import helpers
 
 # formatter = matplotlib.ticker.ScalarFormatter(useMathText=True, useOffset=False)
 
-class animation:
+class Animation:
     def __init__(self,
                  S,
                  alpha=1,
@@ -72,7 +72,7 @@ class animation:
 
     def animate(self, i, verbose=False):
         """draws the i-th frame of the simulation"""
-        if self.S.considered_large:
+        if self.S.considered_large or verbose:
             helpers.report_progress(i, self.S.grid.NT)
         for plot in self.plots:
             plot.update(i)
@@ -125,7 +125,7 @@ class animation:
         return self.fig
 
 from matplotlib import gridspec
-class FullAnimation(animation):
+class FullAnimation(Animation):
     def __init__(self, S, alpha=1, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
         gs = gridspec.GridSpec(4, 3, )
@@ -158,7 +158,7 @@ class FullAnimation(animation):
                  field_plots]
         super().add_plots(plots)
 
-class FastAnimation(animation):
+class FastAnimation(Animation):
     def __init__(self, S, alpha=1, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
         density_axis = self.fig.add_subplot(421)
@@ -183,7 +183,7 @@ class FastAnimation(animation):
                  field_plots]
         super().add_plots(plots)
 
-class OneDimAnimation(animation):
+class OneDimAnimation(Animation):
     def __init__(self, S, alpha=0.6, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
         density_axis = self.fig.add_subplot(321)
@@ -215,9 +215,9 @@ class OneDimAnimation(animation):
                  field_plot]
         super().add_plots(plots)
 
-class ParticleDensityAnimation(animation):
+class ParticleDensityAnimation(Animation):
     def __init__(self, S, alpha, frames="few"):
-        super().__init__(S, frames=frames)
+        super().__init__(S, alpha=alpha, frames=frames)
         density_axis = self.fig.add_subplot(221)
         charge_x_axis = self.fig.add_subplot(222)
         charge_y_axis = self.fig.add_subplot(223)

@@ -221,10 +221,9 @@ def load_simulation(filename: str) -> Simulation:
     """
     f = h5py.File(filename, "r+")
     title = f.attrs['title']
-    grid = load_grid(f, postprocess=True)
+    grid = load_grid(f)
 
-    all_species = [load_species(f, species_group_name, grid, postprocess=True)
-                   for species_group_name in f['species']]
+    all_species = load_species(f, grid)
     run_date = f.attrs['run_date']
     git_version = f.attrs['git_version']
     considered_large = f.attrs['considered_large']

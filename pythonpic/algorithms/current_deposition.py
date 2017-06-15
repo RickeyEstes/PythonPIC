@@ -1,7 +1,6 @@
 # coding=utf-8
 import numpy as np
-import pandas
-# from numba import jit
+# from numba import jit # TODO
 
 c = 299792458 # m /s
 # TODO: this can be optimized plenty

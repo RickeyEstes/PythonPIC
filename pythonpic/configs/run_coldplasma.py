@@ -61,7 +61,7 @@ class cold_plasma_oscillations(Simulation):
         scaling = abs(particle_mass * plasma_frequency ** 2 * L / float(
             particle_charge * N_electrons * epsilon_0))
 
-        grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0)
+        grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
 
         list_species = [
             Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling),
@@ -82,6 +82,6 @@ class cold_plasma_oscillations(Simulation):
     def grid_species_initialization(self):
         for species in self.list_species:
             species.distribute_uniformly(self.grid.L)
-            species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode, self.grid.L)
+            species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode)
         super().grid_species_initialization()
 

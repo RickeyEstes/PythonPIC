@@ -40,7 +40,7 @@ class Plot:
 
     def animation_init(self):
         """
-        Zeroes out all data in all lines of the plot. Useful for animation.
+        Zeroes out all data in all lines of the plot. Useful for Animation.
         """
         for plot in self.plots:
             plot.set_data([], [])
@@ -58,7 +58,7 @@ class Plot:
 
     def return_animated(self):
         """
-        Returns an iterable of all items that have changed. Useful for animation
+        Returns an iterable of all items that have changed. Useful for Animation
         """
         return self.plots
 

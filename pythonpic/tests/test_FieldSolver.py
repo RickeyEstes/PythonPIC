@@ -24,7 +24,7 @@ def _test_charge_density(request):
     return request.param
 
 @pytest.fixture(params=(1, 2 * np.pi, 7.51))
-def _T(request):
+def __t(request):
     return request.param
 
 def test_PoissonSolver(_NG, _L):
@@ -226,8 +226,8 @@ def test_PoissonSolver_ramp(_NG, _L):
     polynomial_coefficients = np.polyfit(g.x, g.electric_field[1:-1, 0], 2)
     assert np.isclose(polynomial_coefficients[0], a / 2, rtol=1e-2), (polynomial_coefficients[0], a / 2, plots())
 
-def test_BunemanSolver(_T, _NG, _L, _test_charge_density):
-    g = Grid(_T, _L, _NG, periodic=False)
+def test_BunemanSolver(__t, _NG, _L, _test_charge_density):
+    g = Grid(__t, _L, _NG, periodic=False)
     charge_index = _NG // 2
     g.current_density_x[charge_index] = _test_charge_density
     g.solve()
@@ -245,8 +245,8 @@ def test_BunemanSolver(_T, _NG, _L, _test_charge_density):
     assert np.isclose(pulled_field, expected_field), plot()
 
 
-def test_BunemanSolver_charge(_T, _NG, _L, _test_charge_density):
-    g = Grid(_T, _L, _NG, periodic=False)
+def test_BunemanSolver_charge(__t, _NG, _L, _test_charge_density):
+    g = Grid(__t, _L, _NG, periodic=False)
     v = 0.5
     g.current_density_x[1:-2] = v * _test_charge_density
     g.solve()

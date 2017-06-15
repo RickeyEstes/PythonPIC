@@ -278,7 +278,7 @@ def test_nonperiodic_particles(g_aperiodic):
 #      plt.plot(proton.momentum_history[:,:,0])
 #      plt.plot((electron.momentum_history + proton.momentum_history)[:,:,0])
 #      plt.show()
-#      assert False, plots(sim, show_animation=True, show_static=True, animation_type=animation.OneDimAnimation, frames="all")
+#      assert False, plots(sim, show_animation=True, show_static=True, animation_type=Animation.OneDimAnimation, frames="all")
 
 def test_laser_pusher():
     S = laser("test_current", 0, 1378, 0, 0, 0)

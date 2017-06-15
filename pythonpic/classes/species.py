@@ -146,29 +146,6 @@ class Species:
     def position_push(self):
         self.x += self.v[:, 0] * self.dt
 
-    def push(self, field_function):
-        """
-        Push the particles using the previously set pushing algorithm.
-
-        Parameters
-        ----------
-        electric_field_function : function
-        magnetic_field_function : function
-            Functions returning arrays of interpolated field values. Shape should be (N_particles, 3).
-
-        Returns
-        -------
-
-        The kinetic energy of the particles, calculated at half timestep.
-        """
-        if self.N_alive:
-            E, B = field_function(self.x)
-            self.x, self.v, self.energy = self.pusher(self, E, self.dt, B)
-            return self.energy
-        else:
-            self.energy = 0
-            return 0
-
     def gather_density(self):
         """A wrapper function to facilitate gathering particle density onto the grid.
         """
@@ -204,7 +181,7 @@ class Species:
                                            plasma_length, self.N, profile)
         self.apply_bc()
 
-    def sinusoidal_position_perturbation(self, amplitude: float, mode: int, L: float):
+    def sinusoidal_position_perturbation(self, amplitude: float, mode: int):
         """
         Displace positions by a sinusoidal perturbation calculated for each particle.
 
@@ -318,50 +295,50 @@ class Species:
         return f"{self.N} {self.scaling:.2e}-{self.name} with q = {self.q:.2e}, m = {self.m:.2e}, {self.saved_iterations} saved history " \
                f"steps over {self.NT} iterations"
 
-def load_species(f, species_name, grid, postprocess=False):
+def load_species(f, grid):
     """
     Loads species data from h5py file.
     Parameters
     ----------
-    species_data : h5py path
-        Path in open hdf5 file
+    f : `h5py.File`
+        Data file
     grid : Grid
         grid to load particles onto
-    postprocess : bool
-        Whether to run additional processing
     Returns
     -------
 
     """
-    name = species_name
-    species_data = f['species'][species_name]
-    name = species_data.attrs['name']
-    N = species_data.attrs['N']
-    q = species_data.attrs['q']
-    m = species_data.attrs['m']
-    scaling = species_data.attrs['scaling']
-    postprocessed = species_data.attrs['postprocessed']
+    # TODO: could do a for loop here to load multiple species
+    list_species = []
+    for name in f['species']:
+        species_data = f['species'][name]
+        N = species_data.attrs['N']
+        q = species_data.attrs['q']
+        m = species_data.attrs['m']
+        scaling = species_data.attrs['scaling']
+        postprocessed = species_data.attrs['postprocessed']
 
 
-    species = Species(q, m, N, grid, name, scaling, individual_diagnostics=False)
-    species.velocity_mean_history = species_data["v_mean"]
-    species.velocity_squared_mean_history = species_data["v2_mean"]
-    species.velocity_std_history = species_data["v_std"]
-    species.density_history = species_data["density_history"]
-    species.file = f
-    species.group = species_data
-    species.postprocessed = postprocessed
+        species = Species(q, m, N, grid, name, scaling, individual_diagnostics=False)
+        species.velocity_mean_history = species_data["v_mean"]
+        species.velocity_squared_mean_history = species_data["v2_mean"]
+        species.velocity_std_history = species_data["v_std"]
+        species.density_history = species_data["density_history"]
+        species.file = f
+        species.group = species_data
+        species.postprocessed = postprocessed
 
 
-    if "x" in species_data and "v" in species_data:
-        species.individual_diagnostics = True
-        species.position_history = species_data["x"]
-        species.velocity_history = species_data["v"]
-    species.N_alive_history = species_data["N_alive_history"]
-    species.kinetic_energy_history = species_data["Kinetic energy"]
-    if not postprocessed:
-        species.postprocess()
-    return species
+        if "x" in species_data and "v" in species_data:
+            species.individual_diagnostics = True
+            species.position_history = species_data["x"]
+            species.velocity_history = species_data["v"]
+        species.N_alive_history = species_data["N_alive_history"]
+        species.kinetic_energy_history = species_data["Kinetic energy"]
+        if not postprocessed:
+            species.postprocess()
+        list_species.append(species)
+    return list_species
 
 class TestSpecies(Species):
 

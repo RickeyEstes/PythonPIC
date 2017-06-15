@@ -5,7 +5,7 @@ import numpy as np
 from scipy import fftpack as fft
 
 
-def PoissonLongitudinalSolver(rho, k, NG, epsilon_0=1, neutralize=True):
+def PoissonLongitudinalSolver(rho, k, epsilon_0=1, neutralize=True):
     """solves the Poisson equation spectrally, via FFT
 
     the Poisson equation can be written either as
@@ -71,15 +71,15 @@ class Solver:
 
 def solve_fourier(grid, neutralize = False):
     grid.electric_field[1:-1, 0] = PoissonLongitudinalSolver(
-        grid.charge_density[:-1], grid.k, grid.NG, epsilon_0=grid.epsilon_0, neutralize=neutralize
+        grid.charge_density[:-1], grid.k, epsilon_0=grid.epsilon_0, neutralize=neutralize
         )
 
-    grid.electric_field[:, 1:], grid.magnetic_field[:, 1:] = BunemanTransversalSolver(grid.electric_field[:, 1:],
-                                                                                      grid.magnetic_field[:, 1:],
-                                                                                      grid.current_density_yz, grid.dt,
-                                                                                      grid.c, grid.epsilon_0)
-    return None
+    E, B = BunemanTransversalSolver(grid.electric_field[:, 1:],
+                                    grid.magnetic_field[:, 1:],
+                                    grid.current_density_yz, grid.dt,
+                                    grid.c, grid.epsilon_0)
 
+    grid.electric_field[:, 1:], grid.magnetic_field[:, 1:] = E, B
 
 solve_fourier_neutral = functools.partial(solve_fourier, neutralize=True)
 
@@ -90,11 +90,11 @@ def solve_buneman(grid):
                                                           grid.dt,
                                                           grid.epsilon_0,
                                                           )
-    grid.electric_field[:, 1:], grid.magnetic_field[:, 1:] = BunemanTransversalSolver(grid.electric_field[:, 1:],
-                                                                                      grid.magnetic_field[:, 1:],
-                                                                                      grid.current_density_yz, grid.dt,
-                                                                                      grid.c, grid.epsilon_0)
-    return None
+    E, B =BunemanTransversalSolver(grid.electric_field[:, 1:],
+                                   grid.magnetic_field[:, 1:],
+                                   grid.current_density_yz, grid.dt,
+                                   grid.c, grid.epsilon_0)
+    grid.electric_field[:, 1:], grid.magnetic_field[:, 1:] = E, B
 
 
 FourierSolver = Solver(solve_fourier_neutral, solve_fourier_neutral)

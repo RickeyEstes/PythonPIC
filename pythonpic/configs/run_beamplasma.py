@@ -73,7 +73,7 @@ class weakbeam_instability(Simulation):
         # background.v[:,:] = 0
         for i, species in enumerate(self.list_species):
             species.distribute_uniformly(self.grid.L, 0.5 * self.grid.dx * i)
-            species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode, self.grid.L)
+            species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode)
             if self.vrandom:
                 species.random_velocity_perturbation(0, self.vrandom)
         super().grid_species_initialization()
