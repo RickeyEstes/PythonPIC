@@ -181,11 +181,25 @@ def directional_velocity_time_plots(S, axis, j):
     for i, s in enumerate(S.list_species):
         # t = np.arange(calculate_particle_snapshots(S.NT), dtype=int) * S.dt * s.save_every_n_iterations
         mean = s.velocity_mean_history[:, j]
-        std = s.velocity_std_history[:, j]
+        # std = s.velocity_std_history[:, j]
         axis.plot(S.grid.t, mean, "-", color=colors[i], label=f"{s.name} $v_{directions[j]}$", alpha=1)
-        axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
+        # axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
     axis.set_xlabel(r"Time $t$")
     axis.set_ylabel(r"Avg. vel. $<v> \pm 1 $ std [m/s]")
+    if len(S.list_species) > 1:
+        axis.legend(loc='best')
+    axis.grid()
+    axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
+
+def total_velocity_time_plots(S, axis):
+    for i, s in enumerate(S.list_species):
+        # t = np.arange(calculate_particle_snapshots(S.NT), dtype=int) * S.dt * s.save_every_n_iterations
+        mean = np.sqrt(np.sum(s.velocity_mean_history[...]**2, axis=1))
+        # std = np.sqrt(np.sum(s.velocity_std_history[...]**2, axis=1))
+        axis.plot(S.grid.t, mean, "-", color=colors[i], label=f"{s.name} $|v|$", alpha=1)
+        # axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
+    axis.set_xlabel(r"Time $t$")
+    axis.set_ylabel(r"Avg. vel. $<|v|>$ [m/s]")
     if len(S.list_species) > 1:
         axis.legend(loc='best')
     axis.grid()
@@ -198,7 +212,8 @@ def static_plots(S, filename=None):
 
     temperature_time_plot(S, axes[1][0])
     energy_time_plots(S, axes[2][0])
-    energy_time_plots(S, axes[0][0], biaxial=True)
+    total_velocity_time_plots(S, axes[0][0])
+    # energy_time_plots(S, axes[0][0], biaxial=True)
     for i in range(2):
         directional_velocity_time_plots(S, axes[i][1], i)
         axes[i][1].yaxis.tick_right()

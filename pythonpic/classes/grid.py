@@ -17,7 +17,7 @@ class Grid:
     def __init__(self, T: float, L: float, NG: int, c: float = 1, epsilon_0: float = 1, bc=lambda *x: None,
                  periodic=True):
         """
-        
+
         Parameters
         ----------
         T : float
@@ -71,7 +71,7 @@ class Grid:
             self.interpolator = field_interpolation.PeriodicInterpolateField
             self.solver = FieldSolver.BunemanSolver
         else:
-            self.charge_gather_function = charge_deposition.aperiodic_density_deposition
+            self.charge_gather_function = charge_deposition.density_deposition
             self.current_longitudinal_gather_function = current_deposition.aperiodic_longitudinal_current_deposition
             self.current_transversal_gather_function = current_deposition.aperiodic_transversal_current_deposition
             self.particle_bc = BoundaryCondition.kill_particles_outside_bounds
@@ -300,4 +300,3 @@ class TestGrid(Grid):
             np.cumsum(self.laser_energy_history**2/ vacuum_wave_impedance * self.dt)
             self.x_current = self.x + self.dx / 2
             self.postprocessed = True
-

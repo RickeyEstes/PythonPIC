@@ -11,7 +11,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
-VERSION = 27
+VERSION = 28
 laser_wavelength = 1.064e-6 # meters
 laser_intensity = 1e23 # watt/meters squared
 impulse_duration = 1e-13 # seconds
@@ -38,7 +38,7 @@ npic = 0.01 * critical_density(laser_wavelength)
 N_MACROPARTICLES = int(maximum_electron_concentration * 1.5 * preplasma_length / npic / spatial_step)
 print(N_MACROPARTICLES)
 n_macroparticles = N_MACROPARTICLES
-scaling = 2*npic# CHECK what should be the proper value here?
+scaling = npic# CHECK what should be the proper value here?
 
 category_name = "laser-shield"
 # assert False
@@ -108,5 +108,3 @@ class laser(Simulation):
         print("Finished initial distribution of particles.")
         super().grid_species_initialization()
         print("Finished initialization.")
-
-

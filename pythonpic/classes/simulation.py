@@ -197,7 +197,7 @@ class Simulation:
         {self.title} simulation ({os.path.basename(self.filename)}) containing {self.NT} iterations with time step {
         self.dt:.3e}
         Done on {self.run_date} from git version {self.git_version}
-        {self.grid.NG}-cell grid of length {self.grid.L:.2f}. Epsilon zero = {self.grid.epsilon_0}, 
+        {self.grid.NG}-cell grid of length {self.grid.L:.2f}. Epsilon zero = {self.grid.epsilon_0},
         c = {self.grid.c}""".strip()
         for species in self.list_species:
             result_string = result_string + "\n" + str(species)

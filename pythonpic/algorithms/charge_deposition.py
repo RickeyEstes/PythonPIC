@@ -20,10 +20,8 @@ def density_deposition(x, dx: float, x_particles):
     numpy.roll is used
     """
     logical_coordinates = (x_particles / dx).astype(int)
-    right_fractions = x_particles / dx - logical_coordinates
-    left_fractions = 1 - right_fractions
-    charge_to_right = right_fractions
-    charge_to_left = left_fractions
+    charge_to_right = x_particles / dx - logical_coordinates
+    charge_to_left = 1 - charge_to_right
     charge_hist_to_right = np.bincount(logical_coordinates+1, charge_to_right, minlength=x.size+1)
     charge_hist_to_left = np.bincount(logical_coordinates, charge_to_left, minlength=x.size+1)
     return charge_hist_to_right + charge_hist_to_left
@@ -33,10 +31,3 @@ def periodic_density_deposition(x, dx: float, x_particles):
     result = density_deposition(x, dx, x_particles)
     result[0] += result[-1]
     return result
-
-
-def aperiodic_density_deposition(x, dx: float, x_particles):
-    result = density_deposition(x, dx, x_particles)
-    return result
-
-
