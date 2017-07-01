@@ -11,7 +11,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
-VERSION = 28
+VERSION = 29
 laser_wavelength = 1.064e-6 # meters
 laser_intensity = 1e23 # watt/meters squared
 impulse_duration = 1e-13 # seconds
@@ -43,7 +43,7 @@ scaling = npic# CHECK what should be the proper value here?
 category_name = "laser-shield"
 # assert False
 class laser(Simulation):
-    def __init__(self, filename, n_macroparticles, n_cells, impulse_duration, laser_intensity, perturbation_amplitude, additional_scaling=1):
+    def __init__(self, filename, n_macroparticles, n_cells, impulse_duration, laser_intensity, perturbation_amplitude, additional_scaling=1, laser_polarization="Ez"):
         """
         A simulation of laser-hydrogen shield interaction.
 
@@ -62,7 +62,7 @@ class laser(Simulation):
             Amplitude of the initial position perturbation.
         """
         if laser_intensity:
-            bc_laser = BoundaryCondition.Laser(laser_intensity=laser_intensity,
+            bc_laser = BoundaryCondition.bcs[laser_polarization](laser_intensity=laser_intensity,
                                          laser_wavelength=laser_wavelength,
                                          envelope_center_t = total_time/2,
                                          envelope_width=impulse_duration,
@@ -71,9 +71,9 @@ class laser(Simulation):
                                          epsilon_0=epsilon_zero,
                                          )
             print(f"Laser amplitude: {bc_laser.laser_amplitude:e}")
-            bc = bc_laser.laser_pulse
+            bc = bc_laser
         else:
-            bc = lambda x: None
+            bc = BoundaryCondition.BC
         grid = Grid(T=total_time, L=length, NG=n_cells, c =lightspeed, epsilon_0 =epsilon_zero, bc=bc, periodic=False)
 
         cells_per_wl = laser_wavelength / grid.dx

@@ -13,12 +13,12 @@ intensity = 10**power
 # for power in powers:
 #     intensity = 10**power
 for number_particles, n_cells in [
-    # [10000, number_cells], #unstable
-    # [10000, int(number_cells/2)], #unstable
-    # [10000, int(number_cells/3)], #unstable
-    # [20000, number_cells], # stable-ish
-    # [20000, int(1.5*number_cells)], # stable
-    # [40000, int(number_cells*2)], #
+    [10000, number_cells], #unstable
+    [10000, int(number_cells/2)], #unstable
+    [10000, int(number_cells/3)], #unstable
+    [20000, number_cells], # stable-ish
+    [20000, int(1.5*number_cells)], # stable
+    [40000, int(number_cells*2)], #
     [75000, int(number_cells)], #
     [75000, int(number_cells*2)], #
     [100000, int(number_cells*2)], #

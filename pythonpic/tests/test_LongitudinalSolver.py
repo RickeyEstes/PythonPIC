@@ -33,7 +33,7 @@ def test_empty_grid(T, L, NG, c, epsilon_0):
     g.electric_field[:,0] = 1
     s = Simulation(g)
     s.run(init=False)
-    assert np.allclose(g.electric_field_history[:,:,0], 1), "Current-less grid gathers current somehow."
+    assert np.allclose(g.electric_field_history[:,1:,0], 1), "Current-less grid gathers current somehow."
 
 def test_current_at_grid(T, L, NG, c, epsilon_0):
     g = Grid(T, L, NG, c, epsilon_0)

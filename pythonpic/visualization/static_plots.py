@@ -181,9 +181,9 @@ def directional_velocity_time_plots(S, axis, j):
     for i, s in enumerate(S.list_species):
         # t = np.arange(calculate_particle_snapshots(S.NT), dtype=int) * S.dt * s.save_every_n_iterations
         mean = s.velocity_mean_history[:, j]
-        # std = s.velocity_std_history[:, j]
+        std = s.velocity_std_history[:, j]
         axis.plot(S.grid.t, mean, "-", color=colors[i], label=f"{s.name} $v_{directions[j]}$", alpha=1)
-        # axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
+        axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
     axis.set_xlabel(r"Time $t$")
     axis.set_ylabel(r"Avg. vel. $<v> \pm 1 $ std [m/s]")
     if len(S.list_species) > 1:

@@ -15,7 +15,18 @@ def kill_particles_outside_bounds(species):
     species.N_alive = alive.sum()
 
 
-class Laser:
+class BC:
+    def __init__(self, index=0):
+        self.index = index
+    def apply(self, E, B, t):
+        E[self.index] = self.E_values(t)
+        B[self.index] = self.B_values(t)
+    def E_values(self, t):
+        return (0, 0, 0)
+    def B_values(self, t):
+        return (0, 0, 0)
+
+class Laser(BC):
     """
     Represents a boundary condition for field entering the simulation.
 
@@ -63,10 +74,13 @@ class Laser:
                  laser_phase = 0,
                  c=1,
                  epsilon_0=1,
-                 bc_function = "pulse"):
+                 bc_function = "pulse",
+                 index = 0,):
+        super().__init__(index)
         self.laser_wavelength = laser_wavelength
         self.laser_phase = laser_phase
         self.laser_omega = 2 * np.pi * c / laser_wavelength
+        self.c = c
 
         self.envelope_center_t = envelope_center_t
         self.envelope_width = envelope_width
@@ -79,12 +93,16 @@ class Laser:
         self._taui = 0.5 / np.log(2)**(1/envelope_power) * t_12
         self._tau = 2**(1/envelope_power) * self._taui
         self._t_0 = self._tau * 10**(1/envelope_power)
+
         if bc_function == "pulse":
             self.bc_function = self.laser_pulse
         elif bc_function == "wave":
             self.bc_function = self.laser_wave
         elif bc_function == "envelope":
             self.bc_function = self.laser_envelope
+        else:
+            raise ValueError("Unsupported kind of laser effect.")
+        self.__repr__ = lambda *args, **kwargs: bc_function
 
     def wave_func(self, t):
         return np.sin(self.laser_omega * t + self.laser_phase)
@@ -102,3 +120,43 @@ class Laser:
         return self.laser_wave(t) * self.envelope_func(t)
 
 
+
+class LaserEy(Laser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def E_values(self, t):
+        return (0, self.bc_function(t), 0)
+
+    def B_values(self, t):
+        return (0, 0, self.bc_function(t)/self.c)
+
+class LaserEz(Laser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def E_values(self, t):
+        return (0, 0, self.bc_function(t))
+
+    def B_values(self, t):
+        return (0, self.bc_function(t)/self.c, 0)
+
+class LaserCircular(Laser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bc_function = self.laser_envelope
+
+    def polarisation_phase(self, t):
+        return 2 * np.pi / self.laser_wavelength * self.c * t
+
+    def E_values(self, t):
+        bc = self.bc_function(t)
+        phase = self.polarisation_phase(t)
+        return (0, bc * np.cos(phase), bc * np.sin(phase))
+
+    def B_values(self, t):
+        bc = self.bc_function(t) / self.c
+        phase = self.polarisation_phase(t)
+        return (0, bc * np.sin(phase), bc * np.cos(phase))
+
+bcs = {"Ey": LaserEy, "Ez": LaserEz, "Circular": LaserCircular}

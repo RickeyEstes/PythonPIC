@@ -14,7 +14,7 @@ class Grid:
     """
 
 
-    def __init__(self, T: float, L: float, NG: int, c: float = 1, epsilon_0: float = 1, bc=lambda *x: None,
+    def __init__(self, T: float, L: float, NG: int, c: float = 1, epsilon_0: float = 1, bc=BoundaryCondition.BC(),
                  periodic=True):
         """
 
@@ -57,7 +57,7 @@ class Grid:
         self.L = L
         self.NG = NG
 
-        self.bc_function = bc # REFACTOR boundary condition
+        self.bc = bc
         self.k = 2 * np.pi * fft.fftfreq(self.NG, self.dx)
         self.k[0] = 0.0001
 
@@ -158,15 +158,8 @@ class Grid:
             self.x_current = group['x_current']
 
     def apply_bc(self, i):
-        # noinspection PyCallingNonCallable
-        bc_value = self.bc_function(i * self.dt)
-        if bc_value is not None:
-            self.laser_energy_history[i] = bc_value
-            self.electric_field[0, 1] = bc_value
-            self.magnetic_field[0, 2] = bc_value / self.c
-            # TODO: add polarization
-            # self.electric_field[0, 2] = bc_value
-            # self.magnetic_field[0, 1] = bc_value / self.c
+        self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
+        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index]**2))
 
     def init_solver(self):
         return self.solver.init_solver(self)

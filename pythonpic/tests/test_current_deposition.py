@@ -32,6 +32,12 @@ def _truefalse(request):
 
 _truefalse2 = _truefalse
 
+def error_table(investigated_density, target_density):
+    inexact_indices = investigated_density != target_density
+    error = investigated_density - target_density
+    error[inexact_indices] *= 100 / target_density[inexact_indices]
+    return error
+
 def test_single_particle_longitudinal_deposition(_position, _velocity):
     g = Grid(T = 1, L=7, NG=7)
     s = Particle(g, _position * g.dx, _velocity)
@@ -290,7 +296,7 @@ if __name__ == '__main__':
 #      sim = Simulation(g, [s, s_n], category_type="test", filename=filename)
 #      sim.run().postprocess()
 #      assert False, plots(sim, show_animation=True, animation_type=animation.OneDimAnimation, frames="all")
-@pytest.mark.parametrize(["init_pos", "init_vx", "expected"], [
+@pytest.mark.parametrize(["init_pos", "init_vx", "target_density"], [
     [9.45, 0.9, np.array([0, 0.056, 0.944, 0])], # cases 3, 4
     [9.55, 0.9, np.array([0, 0, 1, 0])], # cases 3, 4
     [9.95, 0.9, np.array([0, 0, 0.611, 0.389])], # cases 3, 4
@@ -310,7 +316,7 @@ if __name__ == '__main__':
     # [9.55, -0.1, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
     # [9.95, -0.1, np.array([0, 0, 1, 0])], # cases 3, 4
     ])
-def test_longitudinal_current(init_pos, init_vx, expected):
+def test_longitudinal_current(init_pos, init_vx, target_density):
     S = laser("test_current", 0, number_cells, 0, 0, 0)
     print(f"dx: {S.grid.dx}, dt: {S.grid.dt}, Neuler: {S.grid.NG}")
     p = Particle(S.grid,
@@ -325,9 +331,7 @@ def test_longitudinal_current(init_pos, init_vx, expected):
     if init_vx == 0.0:
         investigated_density[...] = 0
 
-    target_density = expected
-    error = (investigated_density - target_density) /target_density * 100
-    error[(investigated_density - target_density) == 0] = 0
+    error = error_table(investigated_density, target_density)
     print(pd.DataFrame({"indices": np.arange(9, 13)-1,
                         "found density":investigated_density,
                         "target density":target_density,
@@ -373,8 +377,7 @@ def test_longitudinal_current_multiples(n):
         investigated_density += S.grid.current_density_x[9:13] / (p.eff_q * init_vx * lightspeed)
         expected_density += expected
 
-    error = (investigated_density - expected_density) /expected_density * 100
-    error[(investigated_density - expected_density) == 0] = 0
+    error = error_table(investigated_density, expected_density)
     print(pd.DataFrame({"indices": np.arange(9, 13)-1,
                         "found density":investigated_density,
                         "target density":expected_density,
@@ -451,8 +454,7 @@ def test_longitudinal_current_multiples_as_species(paramset):
     S.grid.gather_current([spec])
     investigated_density = S.grid.current_density_x[9:13] / spec.eff_q
 
-    error = (investigated_density - expected_density) /expected_density * 100
-    error[(investigated_density - expected_density) == 0] = 0
+    error = error_table(investigated_density, expected_density)
     print("FINISHED. PARTICLE DATA")
     print(pd.DataFrame({'x/dx': spec.x/S.grid.dx,
                         'v/c': spec.v[:,0]/spec.c}))
@@ -504,11 +506,9 @@ def test_transversal_current(init_pos, init_vx, expected):
     S.grid.list_species = [p]
     S.grid.gather_current([p])
     investigated_density = S.grid.current_density_yz[9:14, 0] / p.eff_q / init_vy / lightspeed
-    target_density = expected
-    error = (investigated_density - target_density) * 100
-    error[investigated_density != 0] /= investigated_density[investigated_density !=0]
+    error = error_table(investigated_density, expected)
     print(pd.DataFrame({"indices": np.arange(9, 14)-2,
                        "found density":investigated_density,
-                       "target density":target_density,
+                       "target density":expected,
                        "error %":error}))
-    assert np.allclose(investigated_density, target_density, rtol=1e-2, atol=1e-3)
+    assert np.allclose(investigated_density, expected, rtol=1e-2, atol=1e-3)
