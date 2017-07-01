@@ -6,7 +6,7 @@ import pytest
 
 from . import on_failure
 from pythonpic.algorithms import BoundaryCondition
-from ..run_wave import wave_propagation
+from pythonpic.configs.run_wave import wave_propagation
 from pythonpic.visualization.plotting import plots
 
 
@@ -29,8 +29,12 @@ def plot_all(field_history, analytical_solution):
     plt.colorbar(CF2)
     plt.show()
 
-@pytest.fixture(scope="module", params=[lambda x: x.laser_wave, lambda x: x.laser_envelope, lambda x: x.laser_pulse])
+@pytest.fixture(scope="module", params=["pulse", "wave", "envelope"])
 def shape(request):
+    return request.param
+
+@pytest.fixture(scope="module", params=[BoundaryCondition.LaserEy, BoundaryCondition.LaserEy, BoundaryCondition.LaserCircular])
+def lasertype(request):
     return request.param
 
 @pytest.fixture(scope="module", params=[1, 1000, 1e23])
@@ -46,11 +50,10 @@ def power(request):
     return request.param
 
 @pytest.fixture(scope="module")
-def wave_propagation_helper(shape, intensity, wavelength, power):
-    laser = BoundaryCondition.Laser(intensity, wavelength, 10, power)
-    bc = shape(laser)
+def wave_propagation_helper(shape, intensity, wavelength, power, lasertype):
+    laser = lasertype(intensity, wavelength, 10, power, bc_function=shape)
     filename = f"wave_propagation_test_I{intensity}L{wavelength}P{power}"
-    sim = wave_propagation(filename, bc).test_run()
+    sim = wave_propagation(filename, laser).test_run()
     return sim, laser
 
 
