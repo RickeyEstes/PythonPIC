@@ -11,7 +11,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
-VERSION = 29
+VERSION = 31
 laser_wavelength = 1.064e-6 # meters
 laser_intensity = 1e23 # watt/meters squared
 impulse_duration = 1e-13 # seconds
@@ -104,7 +104,7 @@ class laser(Simulation):
     def grid_species_initialization(self):
         for species in self.list_species:
             print(f"Distributing {species.name} nonuniformly.")
-            species.distribute_nonuniformly(length, moat_length_left_side, preplasma_length, main_plasma_length)
+            species.distribute_nonuniformly(length, moat_length_left_side, preplasma_length, main_plasma_length,profile="exponential")
         print("Finished initial distribution of particles.")
         super().grid_species_initialization()
         print("Finished initialization.")

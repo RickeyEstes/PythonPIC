@@ -159,7 +159,7 @@ class Grid:
 
     def apply_bc(self, i):
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
-        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index]**2))
+        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
     def init_solver(self):
         return self.solver.init_solver(self)

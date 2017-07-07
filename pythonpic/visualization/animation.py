@@ -128,20 +128,23 @@ from matplotlib import gridspec
 class FullAnimation(Animation):
     def __init__(self, S, alpha=1, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
-        gs = gridspec.GridSpec(4, 3, )
-        phase_axes = [plt.subplot(gs[0, i]) for i in range(3)]
-        current_axes = [plt.subplot(gs[1, i]) for i in range(3)]
-        field_axes = [plt.subplot(gs[2, i]) for i in range(3)]
-        bonus_row = [plt.subplot(gs[3, i]) for i in range(3)]
-        density_axis, density_perturbation_axis, charge_axes  = bonus_row
 
         if any([species.individual_diagnostics for species in S.list_species]):
+            gs = gridspec.GridSpec(4, 3, )
+            phase_axes = [plt.subplot(gs[0, i]) for i in range(3)]
+            start_index = 1
             phase_plot_x = PhasePlot(self.S, phase_axes[0], "x", "v_x", self.alpha)
             phase_plot_y = PhasePlot(self.S, phase_axes[1], "x", "v_y", self.alpha)
             phase_plot_z = PhasePlot(self.S, phase_axes[2], "x", "v_z", self.alpha)
             plots = [phase_plot_x, phase_plot_y, phase_plot_z]
         else:
+            start_index = 0
+            gs = gridspec.GridSpec(3, 3, )
             plots = []
+        current_axes = [plt.subplot(gs[0 + start_index, i]) for i in range(3)]
+        field_axes = [plt.subplot(gs[1 + start_index, i]) for i in range(3)]
+        bonus_row = [plt.subplot(gs[2 + start_index, i]) for i in range(3)]
+        density_axis, density_perturbation_axis, charge_axes  = bonus_row
         charge_plot = ChargeDistributionPlot(self.S, charge_axes)
         density_plot = SpatialDistributionPlot(self.S, density_axis)
         iteration = IterationCounter(self.S, charge_axes)

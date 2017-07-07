@@ -150,12 +150,12 @@ class LaserCircular(Laser):
         return 2 * np.pi / self.laser_wavelength * self.c * t
 
     def E_values(self, t):
-        bc = self.bc_function(t)
+        bc = self.bc_function(t) * 2 **-0.5
         phase = self.polarisation_phase(t)
         return (0, bc * np.cos(phase), bc * np.sin(phase))
 
     def B_values(self, t):
-        bc = self.bc_function(t) / self.c
+        bc = self.bc_function(t) / self.c * 2 **-0.5
         phase = self.polarisation_phase(t)
         return (0, bc * np.sin(phase), bc * np.cos(phase))
 
