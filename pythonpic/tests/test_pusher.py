@@ -175,14 +175,15 @@ def no_field(x):
     return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
 @pytest.mark.parametrize(["v0", "expected_kin"], [
-    [3/5, 0.15],
-    [4/5, 0.533333333],
+    [3/5, 0.25],
+    [4/5, 0.666666],
     ])
 def test_kinetic_energy(g, v0, expected_kin, _N_particles):
     s = Particle(g, 0, v0, scaling=_N_particles)
-    energy = s.velocity_push(no_field)
-    total_expected_kin = expected_kin * _N_particles * s.dt * g.c**2
+    s.velocity_push(no_field)
+    total_expected_kin = expected_kin * _N_particles * g.c**2
     assert np.isclose(total_expected_kin, s.energy)
+    assert np.isclose(total_expected_kin, s.kinetic_energy)
 
 
 
@@ -204,8 +205,7 @@ def test_high_relativistic_velocity(g, v0):
         s.position_push()
 
     s.save_particle_values(g.NT-1)
-    frac = np.sqrt(np.sum(s.v**2)) * s.dt
-    expected_kinetic_energy = (physics.gamma_from_v(s.v, g.c) - 1).sum() * frac * s.eff_m * g.c**2
+    expected_kinetic_energy = (physics.gamma_from_v(s.v, g.c) - 1).sum() * s.eff_m * g.c**2
     assert np.isclose(s.kinetic_energy_history[1: -1].mean(), expected_kinetic_energy)
     assert np.allclose(s.kinetic_energy_history[1:-1], s.kinetic_energy_history[1:-1].mean(), atol=atol, rtol=rtol), "Energy is off!"
     assert (s.velocity_history < 1).all(), f"Velocity went over c! Max velocity: {s.velocity_history.max()}"

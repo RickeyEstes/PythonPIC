@@ -104,7 +104,7 @@ class Species:
         self.group = group = self.file["species"].create_group(self.name)
         if self.individual_diagnostics:
             self.position_history  = group.create_dataset(name="x", dtype=float, shape=(self.saved_iterations, self.saved_particles))
-            self.velocity_history = group.create_dataset(name="v", dtype=float, shape=(self.saved_iterations, self.saved_particles))
+            self.velocity_history = group.create_dataset(name="v", dtype=float, shape=(self.saved_iterations, self.saved_particles, 3))
         self.density_history = group.create_dataset(name="density_history", dtype=float, shape=(self.NT, self.grid.NG))
         self.velocity_mean_history = group.create_dataset(name="v_mean", dtype=float, shape=(self.NT, 3))
         self.velocity_squared_mean_history = group.create_dataset(name="v2_mean", dtype=float, shape=(self.NT, 3))
@@ -135,9 +135,7 @@ class Species:
 
     @property
     def kinetic_energy(self):
-        total_vel = self.v_magnitude
-        total_vel *= self.gamma -1
-        return total_vel.sum() * self.dt * self.eff_m * self.c**2
+        return (self.gamma - 1).sum() * self.eff_m * self.c**2
 
     def velocity_push(self, field_function, time_multiplier=1):
         E, B = field_function(self.x)
@@ -227,7 +225,7 @@ class Species:
 
     """VELOCITY INITIALIZATION"""
 
-    def sinusoidal_velocity_perturbation(self, axis: int, amplitude: float, mode: int, L: float):
+    def sinusoidal_velocity_perturbation(self, axis: int, amplitude: float, mode: int):
         """
         Displace velocities by a sinusoidal perturbation calculated for each particle.
         
@@ -237,7 +235,7 @@ class Species:
         :param int mode: which mode is excited
         :param float L: grid length
         """
-        self.v[:, axis] += amplitude * np.cos(2 * mode * np.pi * self.x / L)
+        self.v[:, axis] += amplitude * np.cos(2 * mode * np.pi * self.x / self.grid.L)
 
     def random_velocity_perturbation(self, axis: int, std: float):
         """

@@ -314,6 +314,20 @@ class FieldPlot(Plot):
         if self.j != 0:
             self.plots[1].set_data(self.S.grid.x, self.S.grid.magnetic_field_history[i, :, self.j])
 
+class PoyntingFieldPlot(Plot):
+    """
+    Draws electric and magnetic field energy flux (Poynting flux) from the grid
+    """
+
+    def __init__(self, S, ax):
+        super().__init__(S, ax)
+        self.plots.append(self.ax.plot([], [], "-", label=f"Poynting flux")[0])
+        self.ax.set_ylabel(r"Poynting flux")
+        max_P = np.max(np.abs(S.grid.poynting_history[...]))
+        self.ax.set_ylim(-max_P, max_P)
+
+    def update(self, i):
+        self.plots[0].set_data(self.S.grid.x, self.S.grid.poynting_history[i, :])
 
 class CurrentPlot(Plot):
     """

@@ -42,8 +42,7 @@ def boris_velocity_kick(v, eff_q, E, B, dt, eff_m):
     vplus = vminus + np.cross(vprime, s)
     v_new = vplus + eff_q * E / eff_m * dt * 0.5
 
-    fraction = np.sqrt((v**2).sum(axis=1, keepdims=True)) * dt
-    energy = (v_new * v * (0.5 * eff_m) * fraction).sum()
+    energy = (v_new * v * (0.5 * eff_m)).sum()
     v[:] = v_new
     return energy
 
@@ -99,8 +98,7 @@ def rela_boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
 
     final_gamma = np.sqrt(1 + ((v ** 2).sum(axis=1, keepdims=True) / c ** 2))
     v /= final_gamma
-    total_velocity = np.sqrt((v**2).sum(axis=1, keepdims=True)) * dt
-    total_velocity *= final_gamma - 1
+    total_velocity = final_gamma - 1
     return total_velocity.sum() * eff_m * c ** 2
 
 def boris_push(species, E: np.ndarray, dt: float, B: np.ndarray):

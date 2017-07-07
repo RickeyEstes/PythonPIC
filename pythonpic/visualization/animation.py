@@ -7,7 +7,8 @@ import numpy as np
 
 from .time_snapshots import FrequencyPlot, \
     PhasePlot, SpatialDistributionPlot, IterationCounter, \
-    TripleFieldPlot, TripleCurrentPlot, CurrentPlot, FieldPlot, ChargeDistributionPlot, SpatialPerturbationDistributionPlot
+    TripleFieldPlot, TripleCurrentPlot, CurrentPlot, FieldPlot, ChargeDistributionPlot, SpatialPerturbationDistributionPlot, \
+    PoyntingFieldPlot
 from ..helper_functions import helpers
 
 
@@ -72,8 +73,6 @@ class Animation:
 
     def animate(self, i, verbose=False):
         """draws the i-th frame of the simulation"""
-        if self.S.considered_large or verbose:
-            helpers.report_progress(i, self.S.grid.NT)
         for plot in self.plots:
             plot.update(i)
         return self.updatable
@@ -139,7 +138,7 @@ class FullAnimation(Animation):
             plots = [phase_plot_x, phase_plot_y, phase_plot_z]
         else:
             start_index = 0
-            gs = gridspec.GridSpec(3, 3, )
+            gs = gridspec.GridSpec(3, 3)
             plots = []
         current_axes = [plt.subplot(gs[0 + start_index, i]) for i in range(3)]
         field_axes = [plt.subplot(gs[1 + start_index, i]) for i in range(3)]
@@ -150,14 +149,14 @@ class FullAnimation(Animation):
         iteration = IterationCounter(self.S, charge_axes)
         current_plots = TripleCurrentPlot(self.S, current_axes)
         field_plots = TripleFieldPlot(self.S, field_axes)
-        density_perturbation_plot = SpatialPerturbationDistributionPlot(S, density_perturbation_axis)
+        poynting_plot = PoyntingFieldPlot(S, density_perturbation_axis)
 
         plots += [
                  charge_plot,
                  density_plot,
                  iteration,
                  current_plots,
-                 density_perturbation_plot,
+                 poynting_plot,
                  field_plots]
         super().add_plots(plots)
 

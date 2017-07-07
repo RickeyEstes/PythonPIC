@@ -75,7 +75,7 @@ class Simulation:
             species.apply_bc()
         return self
 
-    def iteration(self, i: int, periodic: bool = True):
+    def iteration(self, i: int):
         """
 
         :param periodic: is the simulation periodic? (affects boundary conditions)

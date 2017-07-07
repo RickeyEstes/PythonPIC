@@ -3,6 +3,8 @@
 import numpy as np
 import h5py
 import scipy.fftpack as fft
+from scipy.integrate import cumtrapz, trapz
+
 
 from ..helper_functions import physics
 from ..algorithms import charge_deposition, FieldSolver, BoundaryCondition, current_deposition, field_interpolation
@@ -113,7 +115,9 @@ class Grid:
         if not group.attrs["postprocessed_fourier"]:
             self.longitudinal_energy_history  = group.create_dataset("longitudinal_energy", data=0.5 * self.epsilon_0 * (self.electric_field_history[:,:,0] ** 2))
             perpendicular_electric_energy = 0.5 * self.epsilon_0 * (self.electric_field_history[:,:,1:] ** 2).sum(2) # over directions
-            mu_zero_inv = 1/ (self.epsilon_0 * self.c**2)
+            # mu_zero_inv = 1/ (self.epsilon_0 * self.c**2)
+            mu_zero = np.pi *4e-7
+            mu_zero_inv = 1/mu_zero
             magnetic_energy = 0.5 * (self.magnetic_field_history[...] **2).sum(2) * mu_zero_inv # over directions
 
             self.perpendicular_energy_history = group.create_dataset("perpendicular_energy", data=perpendicular_electric_energy + magnetic_energy)
@@ -124,7 +128,7 @@ class Grid:
             self.longitudinal_energy_per_mode_history = group.create_dataset("longitudinal_fourier", data=np.abs(fftpack.rfft(self.longitudinal_energy_history))[:,::2])
             self.perpendicular_energy_per_mode_history = group.create_dataset("perpendicular_fourier", data=np.abs(fftpack.rfft(self.perpendicular_energy_history))[:,::2])
 
-            self.longitudinal_energy_history  = group.create_dataset("total_longitudinal", data=self.longitudinal_energy_history[...].sum(1))
+            self.longitudinal_energy_history  = group.create_dataset("total_longitudinal", data=trapz(self.electric_field_history[:,:,0]**2 * self.epsilon_0 / 2 / self.dx, self.x, axis=1))
             self.perpendicular_energy_history = group.create_dataset("total_perpendicular", data=self.perpendicular_energy_history[...].sum(1))
             self.grid_energy_history = group.create_dataset("total_grid", data=self.perpendicular_energy_history[...] + self.longitudinal_energy_history[...])
             group.attrs["postprocessed_fourier"] = True
@@ -142,13 +146,24 @@ class Grid:
 
     def postprocess(self, fourier=True):
         group = self.file['grid']
+        self.postprocess_fourier()
         if not self.postprocessed:
             print("Postprocessing grid.")
             self.t = group.create_dataset(name="t", data=np.arange(self.NT) * self.dt)
-            if fourier:
-                self.postprocess_fourier()
             vacuum_wave_impedance= 1/ (self.epsilon_0 * self.c)
             self.laser_energy_history[...] = np.cumsum(self.laser_energy_history[...]**2/ vacuum_wave_impedance * self.dt)
+
+
+            mu_zero_inv = 1/ (self.epsilon_0 * self.c**2)
+            mu_zero = np.pi *4e-7
+            mu_zero_inv = 1/mu_zero
+            poynting = (self.electric_field_history[:, :, 1] * self.magnetic_field_history[:, :, 2] +\
+                        self.electric_field_history[:, :, 2] * self.magnetic_field_history[:, :, 1]) * mu_zero_inv / self.dx
+
+            self.poynting_history = group.create_dataset(name="poynting", data=poynting)
+            integrand = self.poynting_history[:, 0] - self.poynting_history[:, -1]
+            self.energy_via_bc_history = group.create_dataset(name="energy_poynting_bc", data=cumtrapz(integrand, self.t[...], initial=0))
+            self.entering_energy_via_bc_history = group.create_dataset(name="entering_energy_poynting_bc", data=cumtrapz(self.poynting_history[:,0], self.t[...], initial=0))
             self.x_current = group.create_dataset(name="x_current", data=self.x + self.dx / 2)
             self.postprocessed = True
             group.attrs['postprocessed'] = True
@@ -156,6 +171,9 @@ class Grid:
         else:
             self.t = group['t']
             self.x_current = group['x_current']
+            self.poynting_history = group['poynting']
+            self.energy_via_bc_history = group["energy_poynting_bc"]
+            self.entering_energy_via_bc_history = group["entering_energy_poynting_bc"]
 
     def apply_bc(self, i):
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
@@ -207,8 +225,11 @@ class Grid:
         self.magnetic_field_history[i] = self.magnetic_field[1:-1]
 
 
+    def __repr__(self):
+        return f"Grid(T={self.T}, L={self.L}, NG={self.NG}, c={self.c}, epsilon_0={self.epsilon_0}, periodic={self.periodic}, dt={self.dt}, dx={self.dx}"
+
     def __str__(self):
-        return f"NG{self.NG} dx{self.dx} NT {self.NT} dt {self.dt} c{self.c}eps{self.epsilon_0}"
+        return f"Grid(T={self.T}, L={self.L}, NG={self.NG}, c={self.c}, epsilon_0={self.epsilon_0}, periodic={self.periodic}, dt={self.dt}, dx={self.dx}"
 
 def load_grid(file):
     """
@@ -234,7 +255,6 @@ def load_grid(file):
     T = grid_data.attrs['T']
     periodic = grid_data.attrs['periodic']
     postprocessed = grid_data.attrs['postprocessed']
-    print("file is", postprocessed)
 
     x = grid_data['x']
     grid = Grid(T = T,

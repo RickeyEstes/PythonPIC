@@ -93,13 +93,10 @@ def energy_time_plots(S, axis, biaxial = False):
     else:
         twin = axis
     for species in S.list_species:
-        twin.plot(S.t, species.kinetic_energy_history, "-",
+        axis.plot(S.t, species.kinetic_energy_history, "--",
                   label="Kin.: {}".format(species.name))
-    # axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "-", label="Long. E.", alpha=0.7)
-    # axis.plot(np.arange(S.NT) * S.dt, S.grid.perpendicular_energy_history, "-", label="Perp. E.", alpha=0.7)
-    axis.plot(np.arange(S.NT) * S.dt, S.grid.laser_energy_history, "m-", label="Laser E.")
-    # axis.plot(np.arange(S.NT) * S.dt, S.grid.grid_energy_history, "-", label="Potential E.", alpha=0.7)
-    # axis.plot(np.arange(S.NT) * S.dt, S.total_energy, "-", label="Total E.", lw=3, alpha=0.7)
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "-", label="Long. E.", alpha=1)
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.perpendicular_energy_history, "-", label="Perp. E.", alpha=1)
     axis.grid()
     axis.set_xlabel(r"Time $t$")
     axis.set_xlim(0, S.NT * S.dt)
@@ -108,6 +105,42 @@ def energy_time_plots(S, axis, biaxial = False):
     if biaxial:
         twin.legend(loc='lower right')
         twin.set_ylabel("Kinetic energy")
+    axis.set_title("Energy evolution")
+    axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
+
+def alternate_energy_time_plots(S, axis, biaxial = False):
+    if biaxial:
+        twin = axis.twinx()
+    else:
+        twin = axis
+    for species in S.list_species:
+        twin.plot(S.t, species.kinetic_energy_history, "--",
+                  label="Kin.: {}".format(species.name))
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.energy_via_bc_history, "-", label="Energy via Poynting", alpha=0.7)
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.entering_energy_via_bc_history, "-", label="Entering energy via Poynting", alpha=0.7)
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "-", label="Long. E.", alpha=1)
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.perpendicular_energy_history, "-", label="Perp. E.", alpha=1)
+    # twin.plot(np.arange(S.NT) * S.dt, S.grid.laser_energy_history, "m-", label="Laser E.")
+    axis.grid()
+    axis.set_xlabel(r"Time $t$")
+    axis.set_xlim(0, S.NT * S.dt)
+    axis.set_ylabel(r"Energy $E$ [$J/m^2$]")
+    axis.legend(loc='best')
+    if biaxial:
+        twin.legend(loc='lower right')
+        twin.set_ylabel("Kinetic energy")
+    axis.set_title("Energy evolution - alternate")
+    axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
+def electrostatic_energy_time_plots(S, axis):
+    for species in S.list_species:
+        axis.plot(S.t, species.kinetic_energy_history, "-",
+                  label="Kin.: {}".format(species.name))
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "C8-", label="Long. E.", alpha=0.7)
+    axis.grid()
+    axis.set_xlabel(r"Time $t$")
+    axis.set_xlim(0, S.NT * S.dt)
+    axis.set_ylabel(r"Energy $E$ [$J/m^2$]")
+    axis.legend(loc='best')
     axis.set_title("Energy evolution")
     axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
 
@@ -206,6 +239,7 @@ def total_velocity_time_plots(S, axis):
     axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 
 def static_plots(S, filename=None):
+    print(S.grid)
     if filename and not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))
     time_fig, axes = static_plot_window(S, 3, 2)
@@ -219,9 +253,49 @@ def static_plots(S, filename=None):
         axes[i][1].yaxis.tick_right()
         axes[i][1].yaxis.set_label_position("right")
 
+    alternate_energy_time_plots(S, axes[2][1])
+    # axes[2][1].yaxis.tick_right()
+    # axes[2][1].yaxis.set_label_position("right")
+
+    if filename:
+        time_fig.savefig(filename)
+    return time_fig
+
+def electrostatic_static_plots(S, filename=None):
+    if filename and not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    time_fig, axes = static_plot_window(S, 3, 2)
+
+    temperature_time_plot(S, axes[1][0])
+    electrostatic_energy_time_plots(S, axes[2][0])
+    total_velocity_time_plots(S, axes[0][0])
+    # energy_time_plots(S, axes[0][0], biaxial=True)
+    for i in range(2):
+        directional_velocity_time_plots(S, axes[i][1], i)
+        axes[i][1].yaxis.tick_right()
+        axes[i][1].yaxis.set_label_position("right")
+
     alive_time_plots(S, axes[2][1])
     axes[2][1].yaxis.tick_right()
     axes[2][1].yaxis.set_label_position("right")
+
+    if filename:
+        time_fig.savefig(filename)
+    return time_fig
+def static_plots_large(S, filename=None):
+    if filename and not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    time_fig, axes = static_plot_window(S, 3, 2)
+
+    temperature_time_plot(S, axes[1][0])
+    energy_time_plots(S, axes[2][0])
+    total_velocity_time_plots(S, axes[0][0])
+    # energy_time_plots(S, axes[0][0], biaxial=True)
+    for i in range(3):
+        directional_velocity_time_plots(S, axes[i][1], i)
+        axes[i][1].yaxis.tick_right()
+        axes[i][1].yaxis.set_label_position("right")
+
 
     if filename:
         time_fig.savefig(filename)

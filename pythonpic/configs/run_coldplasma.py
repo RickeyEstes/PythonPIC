@@ -6,8 +6,8 @@ from ..classes import Grid, Simulation, Species
 
 from functools import partial
 from ..visualization.plotting import plots
-from ..visualization import animation
-plots = partial(plots, animation_type = animation.OneDimAnimation)
+from ..visualization import animation, static_plots
+plots = partial(plots, animation_type = animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
 
 class cold_plasma_oscillations(Simulation):
     def __init__(self, filename,
@@ -21,6 +21,7 @@ class cold_plasma_oscillations(Simulation):
                              c: float = 1,
                              push_amplitude: float = 0.001,
                              push_mode: float = 1,
+                             scaling = None,
                              **kwargs):
         """
         Runs cold plasma oscillations. Essentially a standing wave.
@@ -58,13 +59,14 @@ class cold_plasma_oscillations(Simulation):
         """
         particle_mass = 1
         particle_charge = particle_mass * qmratio # REFACTOR: use physical units here
-        scaling = abs(particle_mass * plasma_frequency ** 2 * L / float(
-            particle_charge * N_electrons * epsilon_0))
+        if not scaling:
+            scaling = abs(particle_mass * plasma_frequency ** 2 * L / float(
+                particle_charge * N_electrons * epsilon_0))
 
         grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
 
         list_species = [
-            Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling),
+            Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling, individual_diagnostics=True),
             ]
         for name, value in kwargs.items():
             if type(value) == Species:

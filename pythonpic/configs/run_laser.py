@@ -11,7 +11,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
-VERSION = 31
+VERSION = 32
 laser_wavelength = 1.064e-6 # meters
 laser_intensity = 1e23 # watt/meters squared
 impulse_duration = 1e-13 # seconds
@@ -36,14 +36,13 @@ npic = 0.01 * critical_density(laser_wavelength)
 
 
 N_MACROPARTICLES = int(maximum_electron_concentration * 1.5 * preplasma_length / npic / spatial_step)
-print(N_MACROPARTICLES)
 n_macroparticles = N_MACROPARTICLES
-scaling = npic# CHECK what should be the proper value here?
+scaling = npic
 
 category_name = "laser-shield"
 # assert False
 class laser(Simulation):
-    def __init__(self, filename, n_macroparticles, n_cells, impulse_duration, laser_intensity, perturbation_amplitude, additional_scaling=1, laser_polarization="Ez"):
+    def __init__(self, filename, n_macroparticles, n_cells, impulse_duration, laser_intensity, perturbation_amplitude, additional_scaling=1, laser_polarization="Ez", individual_diagnostics=False):
         """
         A simulation of laser-hydrogen shield interaction.
 
@@ -77,14 +76,13 @@ class laser(Simulation):
         grid = Grid(T=total_time, L=length, NG=n_cells, c =lightspeed, epsilon_0 =epsilon_zero, bc=bc, periodic=False)
 
         cells_per_wl = laser_wavelength / grid.dx
-        print(cells_per_wl)
-        vtherm = 2 * np.pi / cells_per_wl * lightspeed / 10
-        print(vtherm / lightspeed)
+        print(f"{cells_per_wl:.1f} grid cells per laser wavelength.")
+        vtherm = 2 * np.pi / cells_per_wl * lightspeed
+        print(f"Thermal velocity for this simulation should be on the order of {vtherm / lightspeed:.3f}c.")
 
         if n_macroparticles:
-            electrons = Species(-electric_charge, electron_rest_mass, n_macroparticles, grid, "electrons", scaling)
-            # electrons.random_velocity_init(vtherm)
-            protons = Species(electric_charge, proton_mass, n_macroparticles, grid, "protons", scaling)
+            electrons = Species(-electric_charge, electron_rest_mass, n_macroparticles, grid, "electrons", scaling, individual_diagnostics=individual_diagnostics)
+            protons = Species(electric_charge, proton_mass, n_macroparticles, grid, "protons", scaling, individual_diagnostics=individual_diagnostics)
             list_species = [electrons, protons]
         else:
             list_species = []
