@@ -104,7 +104,7 @@ class Species:
         self.group = group = self.file["species"].create_group(self.name)
         if self.individual_diagnostics:
             self.position_history  = group.create_dataset(name="x", dtype=float, shape=(self.saved_iterations, self.saved_particles))
-            self.velocity_history = group.create_dataset(name="v", dtype=float, shape=(self.saved_iterations, self.saved_particles))
+            self.velocity_history = group.create_dataset(name="v", dtype=float, shape=(self.saved_iterations, self.saved_particles, 3))
         self.density_history = group.create_dataset(name="density_history", dtype=float, shape=(self.NT, self.grid.NG))
         self.velocity_mean_history = group.create_dataset(name="v_mean", dtype=float, shape=(self.NT, 3))
         self.velocity_squared_mean_history = group.create_dataset(name="v2_mean", dtype=float, shape=(self.NT, 3))

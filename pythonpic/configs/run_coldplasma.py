@@ -6,8 +6,8 @@ from ..classes import Grid, Simulation, Species
 
 from functools import partial
 from ..visualization.plotting import plots
-from ..visualization import animation
-plots = partial(plots, animation_type = animation.OneDimAnimation)
+from ..visualization import animation, static_plots
+plots = partial(plots, animation_type = animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
 
 class cold_plasma_oscillations(Simulation):
     def __init__(self, filename,
@@ -64,7 +64,7 @@ class cold_plasma_oscillations(Simulation):
         grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
 
         list_species = [
-            Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling),
+            Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling, individual_diagnostics=True),
             ]
         for name, value in kwargs.items():
             if type(value) == Species:

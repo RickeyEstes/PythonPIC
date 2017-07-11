@@ -142,11 +142,10 @@ class Grid:
 
     def postprocess(self, fourier=True):
         group = self.file['grid']
+        self.postprocess_fourier()
         if not self.postprocessed:
             print("Postprocessing grid.")
             self.t = group.create_dataset(name="t", data=np.arange(self.NT) * self.dt)
-            if fourier:
-                self.postprocess_fourier()
             vacuum_wave_impedance= 1/ (self.epsilon_0 * self.c)
             self.laser_energy_history[...] = np.cumsum(self.laser_energy_history[...]**2/ vacuum_wave_impedance * self.dt)
             self.x_current = group.create_dataset(name="x_current", data=self.x + self.dx / 2)

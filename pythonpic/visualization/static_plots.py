@@ -112,9 +112,8 @@ def energy_time_plots(S, axis, biaxial = True):
     axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
 
 def electrostatic_energy_time_plots(S, axis):
-    twin = axis.twinx()
     for species in S.list_species:
-        twin.plot(S.t, species.kinetic_energy_history, "-",
+        axis.plot(S.t, species.kinetic_energy_history, "-",
                   label="Kin.: {}".format(species.name))
     axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "C8-", label="Long. E.", alpha=0.7)
     # axis.plot(np.arange(S.NT) * S.dt, S.grid.perpendicular_energy_history, "C9-", label="Perp. E.", alpha=0.7)
@@ -123,8 +122,6 @@ def electrostatic_energy_time_plots(S, axis):
     axis.set_xlim(0, S.NT * S.dt)
     axis.set_ylabel(r"Energy $E$ [$J/m^2$]")
     axis.legend(loc='best')
-    twin.legend(loc='lower right')
-    twin.set_ylabel("Kinetic energy")
     axis.set_title("Energy evolution")
     axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
 
@@ -244,6 +241,27 @@ def static_plots(S, filename=None):
         time_fig.savefig(filename)
     return time_fig
 
+def electrostatic_static_plots(S, filename=None):
+    if filename and not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    time_fig, axes = static_plot_window(S, 3, 2)
+
+    temperature_time_plot(S, axes[1][0])
+    electrostatic_energy_time_plots(S, axes[2][0])
+    total_velocity_time_plots(S, axes[0][0])
+    # energy_time_plots(S, axes[0][0], biaxial=True)
+    for i in range(2):
+        directional_velocity_time_plots(S, axes[i][1], i)
+        axes[i][1].yaxis.tick_right()
+        axes[i][1].yaxis.set_label_position("right")
+
+    alive_time_plots(S, axes[2][1])
+    axes[2][1].yaxis.tick_right()
+    axes[2][1].yaxis.set_label_position("right")
+
+    if filename:
+        time_fig.savefig(filename)
+    return time_fig
 def static_plots_large(S, filename=None):
     if filename and not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))

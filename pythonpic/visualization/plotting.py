@@ -20,6 +20,7 @@ def plots(file,
           snapshot_animation: bool = False,
           alpha: float = 0.7,
           animation_type=animation.FullAnimation,
+          static_type = static_plots.static_plots,
           frames="few"
           ):
     """
@@ -66,7 +67,7 @@ def plots(file,
                 anim_object = anim.full_animation(save_animation)
         if save_static or show_static:
             filename = S.filename.replace(".hdf5", ".png") if save_static else None
-            static = static_plots.static_plots_large(S, filename)
+            static = static_type(S, filename)
             if not show_static:
                 plt.close(static)
         if show_animation or show_static:
