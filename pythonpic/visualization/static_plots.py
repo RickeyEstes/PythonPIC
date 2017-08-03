@@ -135,7 +135,8 @@ def electrostatic_energy_time_plots(S, axis):
     for species in S.list_species:
         axis.plot(S.t, species.kinetic_energy_history, "-",
                   label="Kin.: {}".format(species.name))
-    axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "C8-", label="Long. E.", alpha=0.7)
+    axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "-", label="Long. E.", alpha=0.7)
+    axis.plot(np.arange(S.NT) * S.dt, S.total_energy_history, "--", label="Total E.", alpha=0.7)
     axis.grid()
     axis.set_xlabel(r"Time $t$")
     axis.set_xlim(0, S.NT * S.dt)
@@ -300,3 +301,13 @@ def static_plots_large(S, filename=None):
     if filename:
         time_fig.savefig(filename)
     return time_fig
+
+def publication_plots(S, filename, list_plots):
+    fig, axes = plt.subplots(len(list_plots))
+    if type(axes) is not list:
+        axes = [axes]
+    for plot, ax in zip(list_plots, axes):
+        plot(S, ax)
+
+    fig.savefig(filename)
+    return fig

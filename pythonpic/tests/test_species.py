@@ -26,9 +26,6 @@ def test_n_saved_equal(n_available):
 def test_species(scaling):
     g = Grid(1e-8, 1, 100, c=lightspeed, epsilon_0=epsilon_zero)
     species = Species(electric_charge, electron_rest_mass, 1, g, scaling=scaling)
-    # print(f"\n{lightspeed:.3e}")
     species.v[:, 0] = 10
     kinetic_energy_single_electron = 4.554692e-29
-    # print(species)
-    # print(f"{species.kinetic_energy:.6e}, {kinetic_energy_single_electron*scaling:.6e}")
     assert np.isclose(species.kinetic_energy, kinetic_energy_single_electron*scaling)
