@@ -17,5 +17,5 @@ c = 10
 epsilon_zero = 1
 
 S = cold_plasma_oscillations(f"COSCALING", qmratio=qmratio, plasma_frequency=plasma_frequency, NG=NG,
-                             N_electrons=N_electrons, epsilon_zero=epsilon_zero, push_mode=push_mode, save_data=False, T = T, scaling=scaling, c=c).run()
-plots(S, *args, animation_type = animation.FullAnimation, alpha=0.3)
+                             N_electrons=N_electrons, epsilon_zero=epsilon_zero, push_mode=push_mode, save_data=False, T = T, scaling=scaling, c=c).lazy_run()
+plots(S, *args, animation_type = animation.OneDimAnimation, alpha=0.3)

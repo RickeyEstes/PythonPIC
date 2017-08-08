@@ -171,7 +171,6 @@ def velocity_distribution_plots(S, axis, i=0):
     axis.set_ylabel(r"fraction of superparticles out")
     axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 
-
 def phase_trajectories(S, axis, all=False):
     for species in S.list_species:
         if all:
@@ -192,9 +191,39 @@ def phase_trajectories(S, axis, all=False):
     axis.grid()
     axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 
+def position_trajectories(S, axis, species_index, n_particle = "half"):
+    species = S.list_species[species_index]
+    if n_particle == "half":
+        n_particle = int(species.N/2)
+    axis.set_title("Phase space plot")
+    y = species.position_history[:, n_particle]
+    x = species.save_every_n_iterations * S.dt * np.arange(y.size)
+    axis.set_title(f"Trajectory for particle {n_particle} / {species.N}")
+    axis.plot(x, y, "o--", label=species.name)
+    axis.set_xlim(0, S.grid.L)
+    if len(S.list_species) > 1:
+        axis.legend(loc='best')
+    axis.set_xlabel(r"Time $t$ [s]")
+    axis.set_ylabel(r"Position $x$ [m]")
+    axis.grid()
+    axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 
-"""Multiple window plots"""
-
+def velocity_trajectories(S, axis, species_index, n_particle = "half", direction=0):
+    species = S.list_species[species_index]
+    if n_particle == "half":
+        n_particle = int(species.N/2)
+    axis.set_title("Phase space plot")
+    y = species.velocity_history[:, n_particle, direction]
+    x = species.save_every_n_iterations * S.dt * np.arange(y.size)
+    axis.set_title(f"Velocity history for particle {n_particle} / {species.N}")
+    axis.plot(x, y, "o--", label=species.name)
+    axis.set_xlim(0, S.grid.L)
+    if len(S.list_species) > 1:
+        axis.legend(loc='best')
+    axis.set_xlabel(r"Time $t$ [s]")
+    axis.set_ylabel(r"Velocity [m/s]")
+    axis.grid()
+    axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 
 def velocity_time_plots(S, axis):
     for s in S.list_species:
@@ -271,14 +300,14 @@ def electrostatic_static_plots(S, filename=None):
     electrostatic_energy_time_plots(S, axes[2][0])
     total_velocity_time_plots(S, axes[0][0])
     # energy_time_plots(S, axes[0][0], biaxial=True)
-    for i in range(2):
-        directional_velocity_time_plots(S, axes[i][1], i)
-        axes[i][1].yaxis.tick_right()
-        axes[i][1].yaxis.set_label_position("right")
+    directional_velocity_time_plots(S, axes[0][1], 0)
 
-    alive_time_plots(S, axes[2][1])
-    axes[2][1].yaxis.tick_right()
-    axes[2][1].yaxis.set_label_position("right")
+    position_trajectories(S, axes[1][1], 0)
+    velocity_trajectories(S, axes[2][1], 0)
+
+    # for i in range(3):
+    #     axes[i][1].yaxis.tick_right()
+    #     axes[i][1].yaxis.set_label_position("right")
 
     if filename:
         time_fig.savefig(filename)
