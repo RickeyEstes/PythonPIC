@@ -5,7 +5,7 @@ import numpy as np
 from scipy import fftpack as fft
 
 
-def PoissonLongitudinalSolver(rho, k, epsilon_0=1, neutralize=True):
+def FourierLongitudinalSolver(rho, k, epsilon_0=1, neutralize=True):
     """solves the Poisson equation spectrally, via FFT
 
     the Poisson equation can be written either as
@@ -70,7 +70,7 @@ class Solver:
 
 
 def solve_fourier(grid, neutralize = False):
-    grid.electric_field[1:-1, 0] = PoissonLongitudinalSolver(
+    grid.electric_field[1:-1, 0] = FourierLongitudinalSolver(
         grid.charge_density[:-1], grid.k, epsilon_0=grid.epsilon_0, neutralize=neutralize
         )
 
