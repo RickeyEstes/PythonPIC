@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from ..classes import Simulation
-from pythonpic.classes import TestGrid as Grid
+from pythonpic.classes import TestPeriodicGrid
 from ..visualization.time_snapshots import FieldPlot, CurrentPlot
 from pythonpic.classes import TestSpecies as Species
 
@@ -29,14 +29,14 @@ def epsilon_0(request):
     return request.param
 
 def test_empty_grid(T, L, NG, c, epsilon_0):
-    g = Grid(T, L, NG, c, epsilon_0)
+    g = TestPeriodicGrid(T, L, NG, c, epsilon_0)
     g.electric_field[:,0] = 1
     s = Simulation(g)
     s.run(init=False)
     assert np.allclose(g.electric_field_history[:,1:,0], 1), "Current-less grid gathers current somehow."
 
 def test_current_at_grid(T, L, NG, c, epsilon_0):
-    g = Grid(T, L, NG, c, epsilon_0)
+    g = TestPeriodicGrid(T, L, NG, c, epsilon_0)
     index = int(NG/3)
     g.current_density_x[index+1] = 1
     for i in range(g.NT):

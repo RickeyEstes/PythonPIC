@@ -16,8 +16,7 @@ class Grid:
     """
 
 
-    def __init__(self, T: float, L: float, NG: int, c: float = 1, epsilon_0: float = 1, bc=BoundaryCondition.BC(),
-                 periodic=True):
+    def __init__(self, T: float, L: float, NG: int, c: float = 1, epsilon_0: float = 1, bc=BoundaryCondition.BC()):
         """
 
         Parameters
@@ -33,9 +32,8 @@ class Grid:
         epsilon_0 : float
             electric permittivity of vacuum
         bc : function
-            Function for providing values of the left boundary. To be refactored into taking the Laser object. # REFACTOR
-        periodic: bool
-            Defines whether the grid is to be treated as periodic or non-periodic.
+            Function for providing values of the left boundary. To be refactored into taking the Laser object. #
+            REFACTOR
         """
 
 
@@ -62,23 +60,6 @@ class Grid:
         self.bc = bc
         self.k = 2 * np.pi * fft.fftfreq(self.NG, self.dx)
         self.k[0] = 0.0001
-
-        self.periodic = periodic
-        if self.periodic:
-            self.charge_gather_function = charge_deposition.periodic_density_deposition
-            self.current_longitudinal_gather_function = current_deposition \
-                .periodic_longitudinal_current_deposition
-            self.current_transversal_gather_function = current_deposition.periodic_transversal_current_deposition
-            self.particle_bc = BoundaryCondition.return_particles_to_bounds
-            self.interpolator = field_interpolation.PeriodicInterpolateField
-            self.solver = FieldSolver.BunemanSolver
-        else:
-            self.charge_gather_function = charge_deposition.density_deposition
-            self.current_longitudinal_gather_function = current_deposition.aperiodic_longitudinal_current_deposition
-            self.current_transversal_gather_function = current_deposition.aperiodic_transversal_current_deposition
-            self.particle_bc = BoundaryCondition.kill_particles_outside_bounds
-            self.interpolator = field_interpolation.AperiodicInterpolateField
-            self.solver = FieldSolver.BunemanSolver
 
         self.list_species = []
         self.postprocessed = False
@@ -180,10 +161,10 @@ class Grid:
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
     def init_solver(self):
-        return self.solver.init_solver(self)
+        return FieldSolver.BunemanSolver.init_solver(self)
 
     def solve(self):
-        return self.solver.solve(self)
+        return FieldSolver.BunemanSolver.solve(self)
 
     def direct_energy_calculation(self):
         r"""
@@ -233,6 +214,27 @@ class Grid:
                  f" $\\varepsilon_0 = {self.epsilon_0}$ F/m, $c = {self.c:.2e}$ m/s"
         return string
 
+class PeriodicGrid(Grid):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.charge_gather_function = charge_deposition.periodic_density_deposition
+        self.current_longitudinal_gather_function = current_deposition \
+            .periodic_longitudinal_current_deposition
+        self.current_transversal_gather_function = current_deposition.periodic_transversal_current_deposition
+        self.particle_bc = BoundaryCondition.return_particles_to_bounds
+        self.interpolator = field_interpolation.PeriodicInterpolateField
+        self.periodic = True
+
+class NonperiodicGrid(Grid):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.charge_gather_function = charge_deposition.density_deposition
+        self.current_longitudinal_gather_function = current_deposition.aperiodic_longitudinal_current_deposition
+        self.current_transversal_gather_function = current_deposition.aperiodic_transversal_current_deposition
+        self.particle_bc = BoundaryCondition.kill_particles_outside_bounds
+        self.interpolator = field_interpolation.AperiodicInterpolateField
+        self.periodic = False
+
 def load_grid(file):
     """
     Loads grid data and create a Grid object.
@@ -259,13 +261,11 @@ def load_grid(file):
     postprocessed = grid_data.attrs['postprocessed']
 
     x = grid_data['x']
-    grid = Grid(T = T,
-                L = L,
-                NG = NG,
-                c = c,
-                epsilon_0 = epsilon_0,
-                periodic = periodic
-                )
+    if periodic:
+        grid_type = PeriodicGrid
+    else:
+        grid_type = NonperiodicGrid
+    grid = grid_type(T=T, L=L, NG=NG, c=c, epsilon_0=epsilon_0)
     grid.postprocessed = postprocessed
     grid.file = file
     assert grid.dx == dx
@@ -282,9 +282,43 @@ def load_grid(file):
         grid.postprocess()
     return grid
 
-class TestGrid(Grid):
+class TestPeriodicGrid(PeriodicGrid):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs),
+        self.charge_density_history = np.zeros((self.NT, self.NG))
+        self.current_density_history = np.zeros((self.NT, self.NG, 3))
+        self.electric_field_history = np.zeros((self.NT, self.NG, 3))
+        self.magnetic_field_history = np.zeros((self.NT, self.NG, 3))
+        self.laser_energy_history = np.zeros(self.NT, dtype=float)
+    def postprocess(self, fourier=True):
+        if not self.postprocessed:
+            print("Postprocessing grid.")
+            self.t = np.arange(self.NT) * self.dt
+            if fourier:
+                self.longitudinal_energy_history  = 0.5 * self.epsilon_0 * (self.electric_field_history[:,:,0] ** 2)
+                perpendicular_electric_energy = 0.5 * self.epsilon_0 * (self.electric_field_history[:,:,1:] ** 2).sum(2) # over directions
+                mu_zero_inv = 1/ (self.epsilon_0 * self.c**2)
+                magnetic_energy = 0.5 * (self.magnetic_field_history **2).sum(2) * mu_zero_inv # over directions
+
+                self.perpendicular_energy_history = perpendicular_electric_energy + magnetic_energy
+                self.check_on_charge = np.gradient(self.electric_field_history[:, :, 0], self.dx, axis=1) * self.epsilon_0
+                # fourier analysis
+                from scipy import fftpack
+                self.k_plot = fftpack.rfftfreq(int(self.NG), self.dx)[::2]
+                self.longitudinal_energy_per_mode_history = np.abs(fftpack.rfft(self.longitudinal_energy_history))[:,::2]
+                self.perpendicular_energy_per_mode_history = np.abs(fftpack.rfft(self.perpendicular_energy_history))[:,::2]
+
+                self.longitudinal_energy_history  = self.longitudinal_energy_history.sum(1)
+                self.perpendicular_energy_history = self.perpendicular_energy_history.sum(1)
+                self.grid_energy_history = self.perpendicular_energy_history + self.longitudinal_energy_history # over positions
+            vacuum_wave_impedance= 1/ (self.epsilon_0 * self.c)
+            np.cumsum(self.laser_energy_history**2/ vacuum_wave_impedance * self.dt)
+            self.x_current = self.x + self.dx / 2
+            self.postprocessed = True
+
+class TestNonperiodicGrid(NonperiodicGrid):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs),
         self.charge_density_history = np.zeros((self.NT, self.NG))
         self.current_density_history = np.zeros((self.NT, self.NG, 3))
         self.electric_field_history = np.zeros((self.NT, self.NG, 3))

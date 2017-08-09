@@ -4,14 +4,14 @@ import pytest
 import matplotlib.pyplot as plt
 from pythonpic.classes import Species
 from pythonpic.classes import TestSpecies as Species
-from pythonpic.classes import TestGrid as Grid
+from pythonpic.classes import TestNonperiodicGrid
 
 
 @pytest.mark.parametrize('func', [lambda x: x + 3, lambda x: x**2, lambda x: np.sin(2*np.pi*x)])
 def test_interpolation(func):
     def func2(x):
         return func(x) + 100
-    g = Grid(1, 1, 100, periodic=False)
+    g = TestNonperiodicGrid(1, 1, 100)
     wide_g = (np.arange(g.NG+2)-1)*g.dx
     g.electric_field[:,0] = func2(wide_g)
     s = Species(1, 1, 1000, g)

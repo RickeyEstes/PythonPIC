@@ -9,7 +9,7 @@ from pythonpic.helper_functions.physics import electric_charge, electron_rest_ma
 from ..helper_functions import physics
 from ..algorithms import particle_push
 from ..classes import Species, Particle, Simulation
-from pythonpic.classes import TestGrid as Grid
+from pythonpic.classes import TestPeriodicGrid, TestNonperiodicGrid
 from pythonpic.classes import TestSpecies as Species
 
 from pythonpic.visualization.plotting import plots
@@ -42,12 +42,12 @@ def g():
     NG = 10
     L = NG * dx
 
-    g = Grid(T, L, NG)
+    g = TestPeriodicGrid(T, L, NG)
     return g
 
 @pytest.fixture()
 def g_aperiodic():
-    g = Grid(T=3, L=1, NG=10, periodic=False)
+    g = TestNonperiodicGrid(T=3, L=1, NG=10)
     return g
 
 def plot(t, analytical_result, simulation_result,
@@ -257,7 +257,7 @@ def test_nonperiodic_particles(g_aperiodic):
 
 # @pytest.mark.parametrize("T", [1.05],)
 # def test_energy_conservation_electron(T):
-#     g = Grid(T=T, L=1, NG=100, c=1, periodic=False)
+#     g = TestNonperiodicGrid(T=T, L=1, NG=100, c=1)
 #     electron = Particle(g, 2*g.dx, g.c*0.99, q = -1, m =1e-3, name="electron")
 #     filename = f"test_energy_conservation_electron_{T}"
 #     sim = Simulation(g, [electron], category_type="test", filename=filename)
@@ -271,7 +271,7 @@ def test_nonperiodic_particles(g_aperiodic):
 #
 # @pytest.mark.parametrize("T", [10],)
 # def test_energy_conservation(T):
-#      g = Grid(T=T, L=10, NG=1000, c=1, periodic=False)
+#      g = TestNonperiodicGrid(T=T, L=10, NG=1000, c=1)
 #      electron = Particle(g, g.L/2, g.c*0.99, q = -1, m =1e-3, name="electron")
 #      proton = Particle(g, g.L/2, 0, q = 1, m =2, name="proton")
 #      filename = f"test_energy_conservation_{T}"

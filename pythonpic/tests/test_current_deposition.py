@@ -12,7 +12,7 @@ from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 from pythonpic.algorithms.current_deposition import longitudinal_current_deposition, transversal_current_deposition
 from pythonpic.classes import Particle, Species, Simulation
-from pythonpic.classes import TestGrid as Grid
+from pythonpic.classes import TestPeriodicGrid, TestNonperiodicGrid
 from pythonpic.classes import TestSpecies as Species
 
 
@@ -39,7 +39,7 @@ def error_table(investigated_density, target_density):
     return error
 
 def test_single_particle_longitudinal_deposition(_position, _velocity):
-    g = Grid(T = 1, L=7, NG=7)
+    g = TestNonperiodicGrid(T = 1, L=7, NG=7)
     s = Particle(g, _position * g.dx, _velocity)
     dt = g.dt
     g.current_density_x[...] = 0
@@ -70,7 +70,7 @@ def test_single_particle_longitudinal_deposition(_position, _velocity):
 
 
 def test_single_particle_transversal_deposition(_position, _velocity):
-    g = Grid(1,L=7, NG=7)
+    g = TestPeriodicGrid(1,L=7, NG=7)
     s = Particle(g, _position * g.dx, _velocity, 1, -1)
     dt = g.dx / s.c
     new_positions = s.x + s.v[:, 0] * dt
@@ -110,7 +110,7 @@ def test_single_particle_transversal_deposition(_position, _velocity):
 
 
 def test_single_particle_above_lightspeed():
-    g = Grid(1,L=7, NG=7)
+    g = TestPeriodicGrid(1,L=7, NG=7)
     s = Particle(g, 1*g.dx, g.c*4, g.c*2)
     dt = g.dx / s.c
     g.current_density_x[...] = 0
@@ -124,7 +124,7 @@ def test_single_particle_above_lightspeed():
 def test_two_particles_deposition(_position, _velocity, _truefalse, _truefalse2):
     NG = 7
     L = NG
-    g = Grid(1,L=L, NG=NG)
+    g = TestPeriodicGrid(1,L=L, NG=NG)
     c = 1
     dt = g.dx / c
     positions = [_position * g.dx, (L - _position * g.dx) % L]
@@ -144,7 +144,7 @@ def test_two_particles_deposition(_position, _velocity, _truefalse, _truefalse2)
     collected_weights_x = g.current_density_x.sum(axis=0) / _velocity
     collected_weights_yz = g.current_density_yz.sum(axis=0) / np.array([1, -1], dtype=float)
 
-    g2 = Grid(1,L=L, NG=NG)
+    g2 = TestPeriodicGrid(1,L=L, NG=NG)
     s = Species(1, 1, 2, g2)
     s.x[:] = positions
     s.v[:, 0] = _velocity
@@ -193,7 +193,7 @@ def test_two_particles_deposition(_position, _velocity, _truefalse, _truefalse2)
 def test_many_particles_deposition(N, _velocity):
     NG = 10
     L = NG
-    g = Grid(1,L=L, NG=NG)
+    g = TestPeriodicGrid(1,L=L, NG=NG)
     s = Species(1.0 / N, 1, N, g)
     s.distribute_uniformly(L, 1e-6, 2 * g.dx, 2 * g.dx)
     s.v[:, 0] = _velocity
@@ -228,7 +228,7 @@ def test_many_particles_deposition(N, _velocity):
 def test_many_particles_periodic_deposition(N, _velocity):
     NG = 10
     L = NG
-    g = Grid(1,L=L, NG=NG, periodic=True)
+    g = TestPeriodicGrid(1,L=L, NG=NG)
     s = Species(1.0 / N, 1, N, g)
     s.distribute_uniformly(L)
     s.v[:, 0] = _velocity
@@ -265,17 +265,6 @@ def test_many_particles_periodic_deposition(N, _velocity):
     assert np.allclose(transversal_collected_weights, 1), ("Transversal weights don't match!", plot())
 
 
-# @pytest.mark.parametrize("periodic", [False, True])
-# def test_single_particle_deposition_simulation(periodic):
-#     g = Grid(T=100, L=1, NG=100, c=1, periodic=periodic)
-#     s = Particle(g, g.L / 2, g.dx, g.dx, -g.dx)
-#     sim = Simulation(g, [s], category_type="test",
-#                      filename=f"test_single_particle_depo_sim_{'' if periodic else 'a'}periodic")
-#     try:
-#         sim.run().postprocess()
-#     except Exception as E:
-#         assert False, (E, plots(sim, show_animation=True, show_static=True))
-
 if __name__ == '__main__':
     test_single_particle_transversal_deposition(3.01, 1)
 
@@ -286,7 +275,7 @@ if __name__ == '__main__':
 
 # @pytest.mark.parametrize(["T", "n_end_moat", "perturbation_amplitude",], [[5, 3, 0.3], [5, 5, 0.3],[5, 10, 0.3], [2.5, 20, 0.3]])
 # def test_simulation_at_boundaries(T, n_end_moat, perturbation_amplitude):
-#      g = Grid(T=T, L=1, NG=100, c=1, periodic=False)
+#      g = TestNonperiodicGrid(T=T, L=1, NG=100, c=1)
 #      s_n = Species(-1, 2000, 1000, g, "heavy electrons")
 #      s = Species(+1, 1, 1000, g, "light protons")
 #      s.v[:,0] = +0.3

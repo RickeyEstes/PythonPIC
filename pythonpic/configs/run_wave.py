@@ -2,7 +2,7 @@
 # coding=utf-8
 from ..algorithms import BoundaryCondition
 from ..helper_functions import physics
-from ..classes import Grid, Simulation
+from ..classes import PeriodicGrid, Simulation
 
 VERSION = 2
 
@@ -21,7 +21,7 @@ class wave_propagation(Simulation):
         L = physics.lightspeed * T/4
         epsilon_0 = physics.epsilon_zero
         c = physics.lightspeed
-        grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c, bc=bc, periodic=False)
+        grid = PeriodicGrid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c, bc=bc)
         description = "Electrostatic wave driven by boundary condition"
 
         super().__init__(grid, [], filename=filename, category_type="wave", config_version=VERSION, title=description)

@@ -2,7 +2,7 @@
 # coding=utf-8
 import numpy as np
 
-from ..classes import Grid, Simulation, Species
+from ..classes import PeriodicGrid, Simulation, Species
 from ..helper_functions import physics
 
 from functools import partial
@@ -36,7 +36,7 @@ class two_stream_instability(Simulation):
                            individual_diagnostics=True):
         """Implements two stream instability from Birdsall and Langdon"""
         print("Running two stream instability")
-        grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0)
+        grid = PeriodicGrid(T=T, L=L, NG=NG, epsilon_0=epsilon_0)
         print(f"plasma frequency: {plasma_frequency}")
         print(f"timestep: {grid.dt}")
         print(f"iloczyn: {plasma_frequency * grid.dt}")

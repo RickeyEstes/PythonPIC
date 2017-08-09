@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from ..classes import Simulation
-from pythonpic.classes import TestGrid as Grid
+from pythonpic.classes import TestPeriodicGrid, TestNonperiodicGrid
 from pythonpic.classes import TestSpecies as Species
 from ..visualization.time_snapshots import FieldPlot, CurrentPlot
 
@@ -28,7 +28,7 @@ def __t(request):
     return request.param
 
 def test_PoissonSolver(_NG, _L):
-    g = Grid(1, _L, _NG)
+    g = TestPeriodicGrid(1, _L, _NG)
     charge_density = (2 * np.pi / _L) ** 2 * np.sin(2 * g.x * np.pi / _L)
     field = np.zeros((_NG + 2, 3))
     field[1:-1, 0] = -2 * np.pi / _L * np.cos(2 * np.pi * g.x / _L)
@@ -113,7 +113,7 @@ def test_PoissonSolver_energy_sine(_NG, ):
 
     charge_density_anal = ((2 * np.pi) ** 2 * np.sin(x * 2 * np.pi))
 
-    g = Grid(1,_L, _NG, epsilon_0)
+    g = TestPeriodicGrid(1,_L, _NG, epsilon_0)
     indices_in_denser_grid = np.searchsorted(x, g.x)
     g.charge_density[:-1] = charge_density_anal[indices_in_denser_grid]  # / resolution_increase
 
@@ -163,7 +163,7 @@ def test_PoissonSolver_sheets(_NG, _L, _test_charge_density=1):
     region2 = (_L * 5 / 8 < x) * (x < _L * 6 / 8)
     charge_density[region1] = _test_charge_density
     charge_density[region2] = -_test_charge_density
-    g = Grid(1,_L, _NG, epsilon_0)
+    g = TestPeriodicGrid(1,_L, _NG, epsilon_0)
     g.charge_density[:-1] = charge_density
     g.init_solver()
 
@@ -203,7 +203,7 @@ def test_PoissonSolver_ramp(_NG, _L):
     a = 1
 
     # noinspection PyArgumentEqualDefault
-    g = Grid(1,_L, _NG, epsilon_0=1)
+    g = TestPeriodicGrid(1,_L, _NG, epsilon_0=1)
     g.charge_density[:-1] = a * g.x
     g.init_solver()
     field = a * (g.x - _L / 2) ** 2 / 2
@@ -227,7 +227,7 @@ def test_PoissonSolver_ramp(_NG, _L):
     assert np.isclose(polynomial_coefficients[0], a / 2, rtol=1e-2), (polynomial_coefficients[0], a / 2, plots())
 
 def test_BunemanSolver(__t, _NG, _L, _test_charge_density):
-    g = Grid(__t, _L, _NG, periodic=False)
+    g = TestNonperiodicGrid(__t, _L, _NG)
     charge_index = _NG // 2
     g.current_density_x[charge_index] = _test_charge_density
     g.solve()
@@ -246,7 +246,7 @@ def test_BunemanSolver(__t, _NG, _L, _test_charge_density):
 
 
 def test_BunemanSolver_charge(__t, _NG, _L, _test_charge_density):
-    g = Grid(__t, _L, _NG, periodic=False)
+    g = TestNonperiodicGrid(__t, _L, _NG)
     v = 0.5
     g.current_density_x[1:-2] = v * _test_charge_density
     g.solve()

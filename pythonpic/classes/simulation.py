@@ -81,8 +81,6 @@ class Simulation:
     def iteration(self, i: int):
         """
 
-        :param periodic: is the simulation periodic? (affects boundary conditions)
-        :type periodic: bool
         :param int i: iteration number
         Runs an iteration step
         1. saves field values

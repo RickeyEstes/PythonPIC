@@ -2,7 +2,7 @@
 # coding=utf-8
 import numpy as np
 from pythonpic.algorithms import BoundaryCondition
-from pythonpic.classes import Grid, Simulation, Species
+from pythonpic.classes import NonperiodicGrid, Simulation, Species
 from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, lightspeed, proton_mass, electron_rest_mass, \
     critical_density
 
@@ -73,7 +73,7 @@ class laser(Simulation):
             bc = bc_laser
         else:
             bc = BoundaryCondition.BC
-        grid = Grid(T=total_time, L=length, NG=n_cells, c =lightspeed, epsilon_0 =epsilon_zero, bc=bc, periodic=False)
+        grid = NonperiodicGrid(T=total_time, L=length, NG=n_cells, c =lightspeed, epsilon_0 =epsilon_zero, bc=bc)
 
         cells_per_wl = laser_wavelength / grid.dx
         print(f"{cells_per_wl:.1f} grid cells per laser wavelength.")
