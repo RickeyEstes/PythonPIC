@@ -87,6 +87,7 @@ def test_constant_field(g, _pusher, _N_particles):
     s.save_particle_values(g.NT-1)
     assert np.allclose(s.position_history[:, 0], x_analytical, atol=atol, rtol=rtol), \
         plot(t, x_analytical, s.position_history[:, 0])
+    return Simulation(g, [s])
 
 
 # noinspection PyUnresolvedReferences
@@ -109,6 +110,7 @@ def test_relativistic_constant_field(g, _N_particles):
                                                 f"Velocity went over c! Max velocity: {s.velocity_history.max()}")
     assert np.allclose(s.velocity_history[:, 0, 0], v_analytical, atol=atol, rtol=rtol), \
         plot(t, v_analytical, s.velocity_history[:, 0, 0], )
+    return Simulation(g, [s])
 
 
 # noinspection PyUnresolvedReferences
@@ -134,6 +136,7 @@ def test_relativistic_magnetic_field(g, _N_particles, _v0):
     assert np.allclose(s.kinetic_energy_history[1:-1], s.kinetic_energy_history[1:-1].mean(), atol=atol, rtol=rtol), "Energy is off!"
 
     assert np.allclose(s.velocity_history[:, 0, 1], vy_analytical, atol=atol, rtol=rtol)
+    return Simulation(g, [s])
 
 
 # noinspection PyUnresolvedReferences
