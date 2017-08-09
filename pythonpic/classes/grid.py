@@ -229,7 +229,9 @@ class Grid:
         return f"Grid(T={self.T}, L={self.L}, NG={self.NG}, c={self.c}, epsilon_0={self.epsilon_0}, periodic={self.periodic}, dt={self.dt}, dx={self.dx}"
 
     def __str__(self):
-        return f"Grid(T={self.T}, L={self.L}, NG={self.NG}, c={self.c}, epsilon_0={self.epsilon_0}, periodic={self.periodic}, dt={self.dt}, dx={self.dx}"
+        string = f"{self.NG}-cell grid of length {self.L:.2f} m." \
+                 f" $\\varepsilon_0 = {self.epsilon_0}$ F/m, $c = {self.c:.2e}$ m/s"
+        return string
 
 def load_grid(file):
     """

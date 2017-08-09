@@ -290,7 +290,8 @@ class Species:
         return f"Species(q={self.q:.4f},m={self.m:.4f},N={self.N},name=\"{self.name}\",NT={self.NT})"
 
     def __str__(self):
-        return f"{self.N} {self.scaling:.2e}-{self.name} with q = {self.q:.2e}, m = {self.m:.2e}, {self.saved_iterations} saved history " \
+        return f"{self.N} {self.scaling:.2e}-{self.name} with q = {self.q:.2e} C, m = {self.m:.2e} kg," \
+               f" {self.saved_iterations} saved history " \
                f"steps over {self.NT} iterations"
 
 def load_species(f, grid):

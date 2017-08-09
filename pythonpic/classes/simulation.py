@@ -11,6 +11,8 @@ from .species import load_species
 from ..helper_functions.helpers import report_progress, git_version, config_filename
 
 
+current_time = time.strftime("%Y-%m-%d %H:%M")
+current_time_filename = time.strftime("%Y-%m-%d_%H-%M-%S")
 class Simulation:
     """
 
@@ -25,8 +27,8 @@ class Simulation:
     filename : str
     title : str
     """
-    def __init__(self, grid: Grid, list_species=None, run_date=time.ctime(), git_version=git_version(),
-                 filename=time.strftime("%Y-%m-%d_%H-%M-%S"), category_type=None, config_version=None, title="",
+    def __init__(self, grid: Grid, list_species=None, run_date=current_time, git_version=git_version(),
+                 filename=current_time_filename, category_type=None, config_version=None, title="",
                  considered_large=False):
         self.NT = grid.NT
         self.dt = grid.dt
@@ -194,12 +196,12 @@ class Simulation:
         return self
 
     def __str__(self, *args, **kwargs):
+        filename = os.path.basename(self.filename)
         result_string = f"""
-        {self.title} simulation ({os.path.basename(self.filename)}) containing {self.NT} iterations with time step {
-        self.dt:.3e}
+        {self.title} simulation ({filename}) lasting {self.NT} iterations, dt = {self.dt:.3e} s
         Done on {self.run_date} from git version {self.git_version}
-        {self.grid.NG}-cell grid of length {self.grid.L:.2f}. Epsilon zero = {self.grid.epsilon_0},
-        c = {self.grid.c}""".strip()
+        {self.grid}
+        """.strip()
         for species in self.list_species:
             result_string = result_string + "\n" + str(species)
         return result_string  # REFACTOR: add information from config file (run_coldplasma...)
