@@ -154,14 +154,14 @@ def test_boundaries(plotting=False):
 #     NG = 32
 #     NP = 20000
 #     print(NP/NG/NG)
-#     g = Grid(NT=NT, NG=NG,relativistic=True)
+#     g = PeriodicGrid(NT=NT, NG=NG,relativistic=True)
 #     normalization = NP * 1 / NG
 #     g.current_density = np.ones_like(g.current_density) * 0.5 * normalization
 #     g.current_density[:,1] = 1 * normalization
 #     g.current_density[:,2] = -1 * normalization
 #     print(g.current_density.shape)
 #
-#     g2 = Grid(NG = NG, NT=NT, relativistic=True)
+#     g2 = PeriodicGrid(NG = NG, NT=NT, relativistic=True)
 #     s = Species(1,1,NP, "particles", NT)
 #     s.distribute_uniformly(g2.L,g2.dx/2.5/g2.NG)
 #     s.v = np.ones_like(s.v)*0.5

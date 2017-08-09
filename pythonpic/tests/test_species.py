@@ -2,7 +2,7 @@
 import pytest
 import numpy as np
 from ..classes.species import n_saved_particles
-from pythonpic.classes import Species, Grid
+from pythonpic.classes import Species, PeriodicTestGrid
 from pythonpic.helper_functions.physics import electric_charge, electron_rest_mass, lightspeed, epsilon_zero
 
 @pytest.fixture(params=np.logspace(0, 6, 12, dtype=int))
@@ -24,7 +24,7 @@ def test_n_saved_equal(n_available):
 
 @pytest.mark.parametrize("scaling", [1, 10, 100, 1000])
 def test_species(scaling):
-    g = Grid(1e-8, 1, 100, c=lightspeed, epsilon_0=epsilon_zero)
+    g = PeriodicTestGrid(1e-8, 1, 100, c=lightspeed, epsilon_0=epsilon_zero)
     species = Species(electric_charge, electron_rest_mass, 1, g, scaling=scaling)
     species.v[:, 0] = 10
     kinetic_energy_single_electron = 4.554692e-29

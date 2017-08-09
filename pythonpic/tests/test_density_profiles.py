@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 from ..algorithms import density_profiles
 from ..classes import Species, Simulation
-from pythonpic.classes import TestGrid as Grid
+from pythonpic.classes import PeriodicTestGrid
 from pythonpic.classes import TestSpecies as Species
 from ..visualization.time_snapshots import SpatialPerturbationDistributionPlot, SpatialDistributionPlot
 
@@ -28,7 +28,7 @@ def _profile(request):
 @pytest.fixture()
 def test_density_helper(_fraction, _second_fraction, _profile, _N_particles):
 
-    g = Grid(1, 100, 100)
+    g = PeriodicTestGrid(1, 100, 100)
     s = Species(1, 1, _N_particles, g)
 
     moat_length = g.L * _fraction

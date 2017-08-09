@@ -4,7 +4,7 @@ from functools import partial
 
 import numpy as np
 
-from pythonpic.classes import Grid, Simulation, Species
+from pythonpic.classes import PeriodicGrid, Simulation, Species
 from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, lightspeed, proton_mass, \
     electron_rest_mass, \
     critical_density, cold_plasma_frequency
@@ -56,7 +56,7 @@ class uniform(Simulation):
         n_cells : int
             Number of grid cells.
         """
-        grid = Grid(T=total_time, L=length, NG=int(n_cells), c =lightspeed, epsilon_0 =epsilon_zero, periodic=True)
+        grid = PeriodicGrid(T=total_time, L=length, NG=int(n_cells), c =lightspeed, epsilon_0 =epsilon_zero)
 
 
         cells_per_wl = laser_wavelength / grid.dx

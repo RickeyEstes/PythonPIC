@@ -359,7 +359,7 @@ class Particle(TestSpecies):
     A helper class for quick creation of a single particle for test purposes.
     Parameters
     ----------
-    grid : Grid or Frame
+    grid : Grid
         parent grid
     x : float
         position

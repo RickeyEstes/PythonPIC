@@ -4,7 +4,7 @@
 # import pytest
 #
 # from ..algorithms.field_interpolation import PeriodicInterpolateField
-# from ..classes import Species, Grid
+# from ..classes import Species, PeriodicGrid
 #
 # @pytest.mark.parametrize("power", range(6))
 # def test_poly(power, plotting=False):
@@ -84,7 +84,7 @@
 #     """
 #     NG = 16
 #     L = 1
-#     g = Grid(1, L=L, NG=NG)
+#     g = PeriodicGrid(1, L=L, NG=NG)
 #     s = Species(1, 1, 4, g)
 #
 #     def electric_field_function(x):

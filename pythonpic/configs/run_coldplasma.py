@@ -2,7 +2,7 @@
 # coding=utf-8
 from numpy import pi
 
-from ..classes import Grid, Simulation, Species
+from ..classes import PeriodicGrid, Simulation, Species
 
 from functools import partial
 from ..visualization.plotting import plots
@@ -63,7 +63,7 @@ class cold_plasma_oscillations(Simulation):
             scaling = abs(particle_mass * plasma_frequency ** 2 * L / float(
                 particle_charge * N_electrons * epsilon_0))
 
-        grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
+        grid = PeriodicGrid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
 
         list_species = [
             Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling, individual_diagnostics=True),

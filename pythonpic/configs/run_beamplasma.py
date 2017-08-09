@@ -2,7 +2,7 @@
 # coding=utf-8
 import numpy as np
 
-from ..classes import Grid, Simulation, Species
+from ..classes import PeriodicGrid, Simulation, Species
 
 from functools import partial
 from ..visualization.plotting import plots
@@ -44,7 +44,7 @@ class weakbeam_instability(Simulation):
             return abs(particle_mass * plasma_frequency ** 2 * L / float(
                 particle_charge * N * epsilon_0))
 
-        grid = Grid(L=L, NG=NG, T=T)
+        grid = PeriodicGrid(L=L, NG=NG, T=T)
         filename = f"data_analysis/BP/{filename}/{filename}.hdf5"
 
         plasma = Species(particle_charge, particle_mass, N_plasma, grid, "plasma", scaling(N_plasma))
