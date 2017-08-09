@@ -5,6 +5,25 @@ from pythonpic.configs.run_twostream import two_stream_instability, plots
 
 
 args = plotting_parser("Two stream instability")
+
+S = two_stream_instability("TS_STABLE",
+                           v0 = 0.01,
+                           N_electrons=5000,
+                           plasma_frequency=0.001,
+                           T = 6000,
+                           ).lazy_run()
+print(did_it_thermalize(S))
+plots(S, *args)
+
+S = two_stream_instability("TS_UNSTABLE",
+                           v0 = 0.01,
+                           N_electrons=5000,
+                           plasma_frequency=0.1,
+                           T = 6000,
+                           ).lazy_run()
+print(did_it_thermalize(S))
+plots(S, *args)
+
 S = two_stream_instability("TSe-1",
                        NG=512,
                        N_electrons=4096,

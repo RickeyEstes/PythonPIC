@@ -7,8 +7,8 @@ from ..helper_functions import physics
 
 from functools import partial
 from ..visualization.plotting import plots
-from ..visualization import animation
-plots = partial(plots, animation_type = animation.OneDimAnimation)
+from ..visualization import animation, static_plots
+plots = partial(plots, animation_type = animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
 
 def stability_condition(k0, v0, w0):
     dimensionless_number = k0 * v0 / w0
@@ -32,7 +32,8 @@ class two_stream_instability(Simulation):
                            push_mode=1,
                            v0=0.05,
                            vrandom=0.0,
-                           species_2_sign=1):
+                           species_2_sign=1,
+                           individual_diagnostics=True):
         """Implements two stream instability from Birdsall and Langdon"""
         print("Running two stream instability")
         grid = Grid(T=T, L=L, NG=NG, epsilon_0=epsilon_0)
@@ -53,8 +54,10 @@ class two_stream_instability(Simulation):
 
         expected_stability = stability_condition(k0, v0, plasma_frequency)
 
-        electrons1 = Species(particle_charge, particle_mass, N_electrons, grid, "beam1", scaling=scaling)
-        electrons2 = Species(species_2_sign * particle_charge, particle_mass, N_electrons, grid, "beam2", scaling=scaling)
+        electrons1 = Species(particle_charge, particle_mass, N_electrons, grid, "beam1", scaling=scaling,
+                             individual_diagnostics=individual_diagnostics)
+        electrons2 = Species(species_2_sign * particle_charge, particle_mass, N_electrons, grid, "beam2",
+                             scaling=scaling, individual_diagnostics=individual_diagnostics)
         electrons1.v[:, 0] = v0
         electrons2.v[:, 0] = -v0
         list_species = [electrons1, electrons2]
@@ -72,6 +75,7 @@ class two_stream_instability(Simulation):
         for i, species in enumerate(self.list_species):
             species.distribute_uniformly(self.grid.L, 0.5 * self.grid.dx * i)
             species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode)
+            species.apply_bc()
             if self.vrandom:
                 species.random_velocity_perturbation(0, self.vrandom)
 
