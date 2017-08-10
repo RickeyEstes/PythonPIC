@@ -199,8 +199,7 @@ def position_trajectories(S, axis, species_index, n_particle = "half"):
     y = species.position_history[:, n_particle]
     x = species.save_every_n_iterations * S.dt * np.arange(y.size)
     axis.set_title(f"Trajectory for particle {n_particle} / {species.N}")
-    axis.plot(x, y, "o--", label=species.name)
-    axis.set_xlim(0, S.grid.L)
+    axis.plot(x, y, ".--", label=species.name)
     if len(S.list_species) > 1:
         axis.legend(loc='best')
     axis.set_xlabel(r"Time $t$ [s]")
@@ -216,8 +215,7 @@ def velocity_trajectories(S, axis, species_index, n_particle = "half", direction
     y = species.velocity_history[:, n_particle, direction]
     x = species.save_every_n_iterations * S.dt * np.arange(y.size)
     axis.set_title(f"Velocity history for particle {n_particle} / {species.N}")
-    axis.plot(x, y, "o--", label=species.name)
-    axis.set_xlim(0, S.grid.L)
+    axis.plot(x, y, ".--", label=species.name)
     if len(S.list_species) > 1:
         axis.legend(loc='best')
     axis.set_xlabel(r"Time $t$ [s]")
