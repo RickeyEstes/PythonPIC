@@ -47,7 +47,7 @@ def plots(file,
     if "DISPLAY" not in os.environ.keys():
         print("Can't plot, DISPLAY not defined!")
         return False
-    if show_static or show_animation or save_animation or save_static:
+    if show_static or show_animation or save_animation or save_static or snapshot_animation:
         if isinstance(file, simulation.Simulation):
             S = file
             S.postprocess()
