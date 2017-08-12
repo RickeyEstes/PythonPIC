@@ -46,10 +46,9 @@ class cold_plasma_oscillations(Simulation):
         c : float
             speed of light
         push_amplitude : float
-            amplitude of initial perturbation
+            amplitude of initial perturbation, as fraction of grid dx
         push_mode : int, float
             wavenumber of initial perturbation
-        save_data : bool
         kwargs :
 
         Returns
@@ -59,11 +58,13 @@ class cold_plasma_oscillations(Simulation):
         """
         particle_mass = 1
         particle_charge = particle_mass * qmratio # REFACTOR: use physical units here
+
+
+        grid = PeriodicGrid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
+
         if not scaling:
             scaling = abs(particle_mass * plasma_frequency ** 2 * L / float(
                 particle_charge * N_electrons * epsilon_0))
-
-        grid = PeriodicGrid(T=T, L=L, NG=NG, epsilon_0=epsilon_0, c=c)
 
         list_species = [
             Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling, individual_diagnostics=True),
@@ -74,7 +75,7 @@ class cold_plasma_oscillations(Simulation):
             print(f"{name}:{value}")
 
         self.push_mode = push_mode
-        self.push_amplitude = push_amplitude
+        self.push_amplitude = push_amplitude * grid.dx
 
         description = f"Cold plasma oscillations\nposition initial condition perturbed by sinusoidal oscillation mode " \
                       f"{push_mode} excited with amplitude {push_amplitude}\n"

@@ -8,8 +8,8 @@ from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, li
 
 from functools import partial
 from pythonpic.visualization.plotting import plots
-from pythonpic.visualization import animation
-plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
+from pythonpic.visualization import animation, static_plots
+plots = partial(plots, animation_type = animation.FullAnimation, static_type = static_plots.static_plots_large, alpha=0.3)
 
 VERSION = 32
 laser_wavelength = 1.064e-6 # meters

@@ -30,7 +30,7 @@ def check_plasma_parameter(N_particles, N_grid, dx):
 
 
 def cold_plasma_frequency(electron_density, electron_mass=1, epsilon_0=1, electric_charge=1):
-    return (electron_density * electric_charge ** 2 / electron_mass / epsilon_0) ** 0.5
+    return abs(electron_density * electric_charge ** 2 / electron_mass / epsilon_0) ** 0.5
 
 
 def check_pusher_stability(plasma_frequency, dt):

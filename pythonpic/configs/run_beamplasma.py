@@ -6,8 +6,8 @@ from ..classes import PeriodicGrid, Simulation, Species
 
 from functools import partial
 from ..visualization.plotting import plots
-from ..visualization import animation
-plots = partial(plots, animation_type = animation.OneDimAnimation)
+from ..visualization import animation, static_plots
+plots = partial(plots, animation_type = animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
 
 class weakbeam_instability(Simulation):
     def __init__(self, filename,
@@ -47,8 +47,8 @@ class weakbeam_instability(Simulation):
         grid = PeriodicGrid(L=L, NG=NG, T=T)
         filename = f"data_analysis/BP/{filename}/{filename}.hdf5"
 
-        plasma = Species(particle_charge, particle_mass, N_plasma, grid, "plasma", scaling(N_plasma))
-        beam = Species(particle_charge, particle_mass, N_beam, grid, "beam2", scaling(N_plasma))
+        plasma = Species(particle_charge, particle_mass, N_plasma, grid, "plasma", scaling(N_plasma), individual_diagnostics=True)
+        beam = Species(particle_charge, particle_mass, N_beam, grid, "beam2", scaling(N_plasma), individual_diagnostics=True)
         list_species = [beam, plasma]  # , background]
         description = f"Weak beam instability - beam with $v_0$ {v0:.2f} in cold plasma"
         if vrandom:
