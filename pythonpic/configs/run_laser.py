@@ -81,8 +81,12 @@ class initial(Simulation):
         print(f"Thermal velocity for this simulation should be on the order of {vtherm / lightspeed:.3f}c.")
 
         if n_macroparticles:
-            electrons = Species(-electric_charge, electron_rest_mass, n_macroparticles, grid, "electrons", scaling, individual_diagnostics=individual_diagnostics)
-            protons = Species(electric_charge, proton_mass, n_macroparticles, grid, "protons", scaling, individual_diagnostics=individual_diagnostics)
+            electrons = Species(-electric_charge, electron_rest_mass,
+                                n_macroparticles, grid, "electrons", scaling,
+                                individual_diagnostics=individual_diagnostics)
+            protons = Species(electric_charge, proton_mass, n_macroparticles,
+                              grid, "protons", scaling,
+                              individual_diagnostics=individual_diagnostics)
             list_species = [electrons, protons]
         else:
             list_species = []

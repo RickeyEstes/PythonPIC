@@ -11,17 +11,24 @@ from scipy.stats import maxwell
 
 MAX_SAVED_PARTICLES = int(1e4)
 
-def n_saved_particles(n_p_available, n_upper_limit):
+def n_saved_particles(n_p_available, n_upper_limit = MAX_SAVED_PARTICLES):
     """
+    Calculates the number of saved particles from a dataset preventing it from
+    hitting a predefined upper limit.
 
     Parameters
     ----------
-    n_p_available :
-    n_upper_limit :
+    n_p_available : int
+        number of particles in dataset
+    n_upper_limit : int
+        upper limit of particles that can be saved
 
     Returns
     -------
-
+    save_every_n : int
+        'step' between particles
+    n_saved : int
+        number of saved particles
     """
 
     if n_p_available <= n_upper_limit:
@@ -50,8 +57,6 @@ class Species:
         name of group
     scaling : float
         number of particles represented by each macroparticle
-    pusher : function 
-        particle push algorithm
     """
     def __init__(self, q, m, N, grid, name="particles", scaling=1, pusher=rela_boris_push, individual_diagnostics=False, testing=False):
         self.q = q

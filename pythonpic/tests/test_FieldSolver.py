@@ -33,7 +33,7 @@ def test_PoissonSolver(_NG, _L):
     field = np.zeros((_NG + 2, 3))
     field[1:-1, 0] = -2 * np.pi / _L * np.cos(2 * np.pi * g.x / _L)
     g.charge_density[:-1] = charge_density
-    g.init_solver()
+    g.init_solve()
 
     def plots():
         fig, axes = plt.subplots(2)
@@ -117,7 +117,7 @@ def test_PoissonSolver_energy_sine(_NG, ):
     indices_in_denser_grid = np.searchsorted(x, g.x)
     g.charge_density[:-1] = charge_density_anal[indices_in_denser_grid]  # / resolution_increase
 
-    g.init_solver()
+    g.init_solve()
     g.save_field_values(0)
     g.postprocess()
     energy_fourier = g.grid_energy_history[0]
@@ -165,7 +165,7 @@ def test_PoissonSolver_sheets(_NG, _L, _test_charge_density=1):
     charge_density[region2] = -_test_charge_density
     g = PeriodicTestGrid(1, _L, _NG, epsilon_0)
     g.charge_density[:-1] = charge_density
-    g.init_solver()
+    g.init_solve()
 
     def plots():
         fig, axes = plt.subplots(3)
@@ -205,7 +205,7 @@ def test_PoissonSolver_ramp(_NG, _L):
     # noinspection PyArgumentEqualDefault
     g = PeriodicTestGrid(1, _L, _NG, epsilon_0=1)
     g.charge_density[:-1] = a * g.x
-    g.init_solver()
+    g.init_solve()
     field = a * (g.x - _L / 2) ** 2 / 2
 
     def plots():

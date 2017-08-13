@@ -54,10 +54,12 @@ class initial(Simulation):
 
         expected_stability = stability_condition(k0, v0, plasma_frequency)
 
-        electrons1 = Species(particle_charge, particle_mass, N_electrons, grid, "beam1", scaling=scaling,
+        electrons1 = Species(particle_charge, particle_mass, N_electrons, grid,
+                             "beam1", scaling=scaling,
                              individual_diagnostics=individual_diagnostics)
-        electrons2 = Species(species_2_sign * particle_charge, particle_mass, N_electrons, grid, "beam2",
-                             scaling=scaling, individual_diagnostics=individual_diagnostics)
+        electrons2 = Species(species_2_sign * particle_charge, particle_mass,
+                             N_electrons, grid, "beam2", scaling=scaling,
+                             individual_diagnostics=individual_diagnostics)
         electrons1.v[:, 0] = v0
         electrons2.v[:, 0] = -v0
         list_species = [electrons1, electrons2]

@@ -72,7 +72,7 @@ class Simulation:
             species.velocity_push(self.grid.field_function, -0.5)
         self.grid.gather_charge(self.list_species)
         self.grid.gather_current(self.list_species)
-        self.grid.init_solver()
+        self.grid.init_solve()
         for species in self.list_species:
             species.position_push()
             species.apply_bc()

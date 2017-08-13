@@ -5,9 +5,9 @@ import h5py
 import scipy.fftpack as fft
 from scipy.integrate import cumtrapz, trapz
 
-
 from ..helper_functions import physics
-from ..algorithms import charge_deposition, FieldSolver, BoundaryCondition, current_deposition, field_interpolation
+from ..algorithms import charge_deposition, FieldSolver, BoundaryCondition, \
+    current_deposition, field_interpolation
 
 
 class Grid:
@@ -31,8 +31,6 @@ class Grid:
         electric permittivity of vacuum
     bc : `BoundaryCondition`
     """
-
-
 
     def __init__(self, T: float, L: float, NG: int, c: float = 1,
                  epsilon_0: float = 1, bc=BoundaryCondition.BC()):
@@ -83,21 +81,20 @@ class Grid:
         self.laser_energy_history = group.create_dataset(name="laser", dtype=float, shape=(self.NT,))
         group.create_dataset(name="x", dtype=float, data=self.x)
 
-        h5py_dictionary = {'NGrid': self.NG,
-                           'L': self.L,
-                           'epsilon_0': self.epsilon_0,
-                           'c': self.c,
-                           'dt': self.dt,
-                           'dx': self.dx,
-                           'NT': self.NT,
-                           'T': self.T,
-                           'periodic': self.periodic,
-                           'postprocessed': self.postprocessed,
+        h5py_dictionary = {'NGrid':                 self.NG,
+                           'L':                     self.L,
+                           'epsilon_0':             self.epsilon_0,
+                           'c':                     self.c,
+                           'dt':                    self.dt,
+                           'dx':                    self.dx,
+                           'NT':                    self.NT,
+                           'T':                     self.T,
+                           'periodic':              self.periodic,
+                           'postprocessed':         self.postprocessed,
                            'postprocessed_fourier': self.postprocessed_fourier
                            }
         for key, value in h5py_dictionary.items():
             group.attrs[key] = value
-
 
     def postprocess(self):
         """
@@ -117,7 +114,7 @@ class Grid:
 
 
             mu_zero_inv = 1/ (self.epsilon_0 * self.c**2)
-            poynting = (self.electric_field_history[:, :, 1] * self.magnetic_field_history[:, :, 2] +\
+            poynting = (self.electric_field_history[:, :, 1] * self.magnetic_field_history[:, :, 2] +
                         self.electric_field_history[:, :, 2] * self.magnetic_field_history[:, :, 1]) * mu_zero_inv / self.dx
 
             self.poynting_history = group.create_dataset(name="poynting", data=poynting)
@@ -161,7 +158,6 @@ class Grid:
             self.perpendicular_energy_history = group["total_perpendicular"]
             self.grid_energy_history = group["total_grid"]
 
-
     def apply_bc(self, i):
         """
         Applies boundary conditions at a given iteration, modifying fields in
@@ -175,7 +171,7 @@ class Grid:
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
-    def init_solver(self):
+    def init_solve(self):
         """
         Performs the initial, spectral iteration of the field solver.
         See `FieldSolver` for details.
@@ -275,7 +271,6 @@ class Grid:
         self.electric_field_history[i] = self.electric_field[1:-1]
         self.magnetic_field_history[i] = self.magnetic_field[1:-1]
 
-
     def __repr__(self):
         return f"Grid(T={self.T}, L={self.L}, NG={self.NG}, c={self.c}," \
                f" epsilon_0={self.epsilon_0}, periodic={self.periodic}," \
@@ -285,6 +280,7 @@ class Grid:
         return f"{self.NG}-cell grid of length {self.L:.2f} m." \
                f" $\\varepsilon_0 = {self.epsilon_0}$ F/m," \
                f" $c = {self.c:.2e}$ m/s"
+
 
 class PeriodicGrid(Grid):
     """
@@ -305,6 +301,7 @@ class PeriodicGrid(Grid):
         electric permittivity of vacuum
     bc : `BoundaryCondition`
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.charge_gather_function = charge_deposition.periodic_density_deposition
@@ -314,6 +311,7 @@ class PeriodicGrid(Grid):
         self.particle_bc = BoundaryCondition.return_particles_to_bounds
         self.interpolator = field_interpolation.PeriodicInterpolateField
         self.periodic = True
+
 
 class NonperiodicGrid(Grid):
     """
@@ -334,6 +332,7 @@ class NonperiodicGrid(Grid):
         electric permittivity of vacuum
     bc : `BoundaryCondition`
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.charge_gather_function = charge_deposition.density_deposition
@@ -377,6 +376,7 @@ class PeriodicTestGrid(PeriodicGrid):
             np.cumsum(self.laser_energy_history**2/ vacuum_wave_impedance * self.dt)
             self.x_current = self.x + self.dx / 2
             self.postprocessed = True
+
 
 class NonperiodicTestGrid(NonperiodicGrid):
     def __init__(self, *args, **kwargs):
@@ -459,5 +459,3 @@ def load_grid(file):
     if not postprocessed:
         grid.postprocess()
     return grid
-
-

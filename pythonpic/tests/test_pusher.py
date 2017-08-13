@@ -71,7 +71,8 @@ def plot(t, analytical_result, simulation_result,
 
 
 def test_constant_field(g, _pusher, _N_particles):
-    s = Species(1, 1, _N_particles, g, pusher=_pusher, individual_diagnostics=True)
+    s = Species(1, 1, _N_particles, g, pusher=_pusher,
+                individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
     def uniform_field(x):

@@ -66,9 +66,11 @@ class initial(Simulation):
 
 
         if n_macroparticles:
-            electrons = Species(-electric_charge, electron_rest_mass, n_macroparticles, grid, "electrons", scaling)
+            electrons = Species(-electric_charge, electron_rest_mass,
+                                n_macroparticles, grid, "electrons", scaling)
             electrons.random_velocity_init(vtherm)
-            protons = Species(electric_charge, proton_mass, n_macroparticles, grid, "protons", scaling)
+            protons = Species(electric_charge, proton_mass, n_macroparticles,
+                              grid, "protons", scaling)
             list_species = [electrons, protons]
 
             omega_p = (cold_plasma_frequency(electrons.scaling * electrons.N / grid.dx, electron_rest_mass, epsilon_zero, electric_charge)**2 + 3 * (grid.NG * 2 * np.pi / grid.L * vtherm)**2)**0.5

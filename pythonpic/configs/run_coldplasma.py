@@ -67,7 +67,9 @@ class initial(Simulation):
                 particle_charge * N_electrons * epsilon_0))
 
         list_species = [
-            Species(N=N_electrons, q=particle_charge, m=particle_mass, grid=grid, name="electrons", scaling=scaling, individual_diagnostics=True),
+            Species(q=particle_charge, m=particle_mass, N=N_electrons, grid=grid,
+                    name="electrons", scaling=scaling,
+                    individual_diagnostics=True),
             ]
         for name, value in kwargs.items():
             if type(value) == Species:

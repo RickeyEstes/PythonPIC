@@ -47,8 +47,11 @@ class initial(Simulation):
         grid = PeriodicGrid(L=L, NG=NG, T=T)
         filename = f"data_analysis/BP/{filename}/{filename}.hdf5"
 
-        plasma = Species(particle_charge, particle_mass, N_plasma, grid, "plasma", scaling(N_plasma), individual_diagnostics=True)
-        beam = Species(particle_charge, particle_mass, N_beam, grid, "beam2", scaling(N_plasma), individual_diagnostics=True)
+        plasma = Species(particle_charge, particle_mass, N_plasma, grid,
+                         "plasma", scaling(N_plasma),
+                         individual_diagnostics=True)
+        beam = Species(particle_charge, particle_mass, N_beam, grid, "beam2",
+                       scaling(N_plasma), individual_diagnostics=True)
         list_species = [beam, plasma]  # , background]
         description = f"Weak beam instability - beam with $v_0$ {v0:.2f} in cold plasma"
         if vrandom:

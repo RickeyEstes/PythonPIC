@@ -40,7 +40,7 @@ def error_table(investigated_density, target_density):
 
 def test_single_particle_longitudinal_deposition(_position, _velocity):
     g = NonperiodicTestGrid(T = 1, L=7, NG=7)
-    s = Particle(g, _position * g.dx, _velocity)
+    s = Particle(g, _position * g.dx, _velocity, )
     dt = g.dt
     g.current_density_x[...] = 0
     g.current_density_yz[...] = 0
@@ -111,7 +111,7 @@ def test_single_particle_transversal_deposition(_position, _velocity):
 
 def test_single_particle_above_lightspeed():
     g = PeriodicTestGrid(1, L=7, NG=7)
-    s = Particle(g, 1*g.dx, g.c*4, g.c*2)
+    s = Particle(g, 1 * g.dx, g.c * 4, g.c * 2)
     dt = g.dx / s.c
     g.current_density_x[...] = 0
     g.current_density_yz[...] = 0
