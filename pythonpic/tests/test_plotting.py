@@ -6,7 +6,7 @@ import numpy as np
 from time import time
 
 from ..helper_functions import helpers
-from ..configs.run_coldplasma import cold_plasma_oscillations
+from ..configs.run_coldplasma import initial
 from ..visualization.plotting import plots
 from ..visualization import animation
 from ..visualization.static_plots import static_plots
@@ -20,7 +20,7 @@ def helper_short_simulation():
         return False
     else:
         run_name = "visualization_test"
-        S = cold_plasma_oscillations(run_name, save_data=False).run().postprocess()
+        S = initial(run_name, save_data=False).run().postprocess()
         return S
 
 

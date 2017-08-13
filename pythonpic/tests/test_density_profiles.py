@@ -69,7 +69,7 @@ def test_fitness(test_density_helper, std):
 
 # @pytest.mark.parametrize("std", [0])
 # def test_stability(std):
-#     S = laser("stability_test", 1000, 1378, 0, 0, std).test_run()
+#     S = initial("stability_test", 1000, 1378, 0, 0, std).test_run()
 #     def plots():
 #         fig, ax = plt.subplots()
 #         fig.suptitle(std)

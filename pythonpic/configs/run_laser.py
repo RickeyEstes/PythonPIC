@@ -41,7 +41,7 @@ scaling = npic
 
 category_name = "laser-shield"
 # assert False
-class laser(Simulation):
+class initial(Simulation):
     def __init__(self, filename, n_macroparticles, n_cells, impulse_duration, laser_intensity, perturbation_amplitude, additional_scaling=1, laser_polarization="Ez", individual_diagnostics=False):
         """
         A simulation of laser-hydrogen shield interaction.

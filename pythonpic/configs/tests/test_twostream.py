@@ -4,7 +4,7 @@ import numpy as np
 
 from . import on_failure
 from pythonpic.helper_functions.physics import did_it_thermalize
-from ..run_twostream import two_stream_instability, plots
+from ..run_twostream import initial, plots
 
 
 @pytest.mark.parametrize(["L", "NG", "N_electrons"], [
@@ -21,13 +21,13 @@ def test_linear_regime_beam_stability(L, NG, N_electrons):
     dt = dx / c
     T = 50000 * dt
     # NT = T / dt = 50000 * c / dx = 50000 * c * NG / L
-    S = two_stream_instability(run_name,
-                               NG=NG,
-                               L=L,
-                               T = T,
-                               N_electrons=N_electrons,
-                               v0 = 0.01,
-                               ).test_run()
+    S = initial(run_name,
+                NG=NG,
+                L=L,
+                T = T,
+                N_electrons=N_electrons,
+                v0 = 0.01,
+                ).test_run()
     assert (~did_it_thermalize(S)).all(), ("A linear regime run came out unstable.", plots(S, *on_failure))
 
 
@@ -43,7 +43,7 @@ def test_linear_regime_beam_stability(L, NG, N_electrons):
 #     c = 1
 #     dt = dx / c
 #     T = 50000 * dt
-#     S = two_stream_instability(run_name,
+#     S = initial(run_name,
 #                                NG=NG,
 #                                N_electrons=N_electrons,
 #                                L=L,
@@ -61,7 +61,7 @@ def test_linear_regime_beam_stability(L, NG, N_electrons):
 # def test_electron_positron(v0, NT):
 #     """the electron-positron run is much noisier
 #     the particles do not really seem to jump between beams """
-#     S = two_stream_instability("TS_EP", NG=64, N_electrons=512, plasma_frequency=5, NT=NT, v0=v0, species_2_sign=-1,
+#     S = initial("TS_EP", NG=64, N_electrons=512, plasma_frequency=5, NT=NT, v0=v0, species_2_sign=-1,
 #                                save_data=False)
 #     average_velocities = [sp.velocity_history[:, int(sp.N / 2), 0].mean() for sp in S.list_species]
 #     avg_velocity_difference = abs(average_velocities[1] - average_velocities[0])
@@ -73,7 +73,7 @@ def test_linear_regime_beam_stability(L, NG, N_electrons):
 #    (0.95,), (1.05,), (1.25,),
 #    ])
 # def test_push_amplitude(push_amplitude):
-#     S = two_stream_instability(f"TS_PUSH_{push_amplitude}",
+#     S = initial(f"TS_PUSH_{push_amplitude}",
 #                            NG=64,
 #                            N_electrons=512,
 #                            push_amplitude=push_amplitude,
@@ -82,9 +82,9 @@ def test_linear_regime_beam_stability(L, NG, N_electrons):
 #     # TEST: finish this
 def test_finish():
     """Tests whether the simulation finishes at all."""
-    S = two_stream_instability("TS_FINISH",
-                               NG=512,
-                               N_electrons=4096,
-                               plasma_frequency=0.05 / 4,
-                               ).test_run()
+    S = initial("TS_FINISH",
+                NG=512,
+                N_electrons=4096,
+                plasma_frequency=0.05 / 4,
+                ).test_run()
     assert True, ("The simulation did not finish.", plots(S, *on_failure))

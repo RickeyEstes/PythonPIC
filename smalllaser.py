@@ -1,6 +1,6 @@
 # coding=utf-8
 from pythonpic import plotting_parser
-from pythonpic.configs.run_laser import laser, impulse_duration, n_macroparticles, plots, number_cells
+from pythonpic.configs.run_laser import initial, impulse_duration, n_macroparticles, plots, number_cells
 from pythonpic.visualization.plotting import plots as general_plots
 from pythonpic.visualization.animation import ParticleDensityAnimation
 
@@ -26,7 +26,7 @@ for polarization in polarizations:
         # [150000, int(number_cells*3)], #
         # [150000, int(number_cells*4)], #
         ]:
-        s = laser(f"{number_particles}_{n_cells}_run_{power}_{polarization}", number_particles, n_cells, impulse_duration,
-                  intensity, perturbation_amplitude=0, individual_diagnostics=True, laser_polarization=polarization).lazy_run()
+        s = initial(f"{number_particles}_{n_cells}_run_{power}_{polarization}", number_particles, n_cells, impulse_duration,
+                    intensity, perturbation_amplitude=0, individual_diagnostics=True, laser_polarization=polarization).lazy_run()
         plots(s, *args, frames="few")
         del s

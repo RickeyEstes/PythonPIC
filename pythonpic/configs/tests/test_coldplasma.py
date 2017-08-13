@@ -4,7 +4,7 @@ import pytest
 
 from . import on_failure
 from pythonpic.helper_functions.physics import get_dominant_mode
-from ..run_coldplasma import cold_plasma_oscillations, plots
+from ..run_coldplasma import initial, plots
 
 
 @pytest.mark.parametrize("push_mode", range(1, 10, 2))
@@ -16,8 +16,8 @@ def test_linear_dominant_mode(push_mode):
     qmratio = -1
 
     run_name = f"CO_LINEAR_{push_mode}"
-    S = cold_plasma_oscillations(run_name, qmratio=qmratio, plasma_frequency=plasma_frequency, NG=NG,
-                                 N_electrons=N_electrons, push_mode=push_mode).test_run()
+    S = initial(run_name, qmratio=qmratio, plasma_frequency=plasma_frequency, NG=NG,
+                N_electrons=N_electrons, push_mode=push_mode).test_run()
     calculated_dominant_mode = get_dominant_mode(S)
     assert (calculated_dominant_mode == push_mode) or (calculated_dominant_mode % push_mode == 0), (
         f"got {calculated_dominant_mode} instead of {push_mode}",
@@ -31,7 +31,7 @@ def test_linear_dominant_mode(push_mode):
 #     """aliasing effect with particles exactly at or close to grid nodes.
 #     Particles exactly on grid nodes cause excitation of high modes.
 #     Even a slight push prevents that."""
-#     S = cold_plasma_oscillations(f"CO_KWI_STABLE_{N_electrons}_PUSH_{push_amplitude}",
+#     S = initial(f"CO_KWI_STABLE_{N_electrons}_PUSH_{push_amplitude}",
 #                                  N_electrons=N_electrons, NG=256,
 #                                  T = 200,
 #                                  push_mode=2,
@@ -43,12 +43,12 @@ def test_linear_dominant_mode(push_mode):
 @pytest.mark.parametrize("N", [128])
 def test_kaiser_wilhelm_instability(N):
     # __doc__ = test_kaiser_wilhelm_instability_avoidance.__doc__
-    S = cold_plasma_oscillations(f"CO_KWI_UNSTABLE_{N}",
-                                 N_electrons=N, NG=N,
-                                 T = 200,
-                                 push_mode=2,
-                                 push_amplitude=0
-                                 ).test_run()
+    S = initial(f"CO_KWI_UNSTABLE_{N}",
+                N_electrons=N, NG=N,
+                T = 200,
+                push_mode=2,
+                push_amplitude=0
+                ).test_run()
     assert get_dominant_mode(S) > 1, plots(S, show_animation=True)
 
 

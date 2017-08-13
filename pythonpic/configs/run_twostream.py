@@ -19,7 +19,7 @@ def stability_condition(k0, v0, w0):
     return expected_stability
 
 
-class two_stream_instability(Simulation):
+class initial(Simulation):
     def __init__(self, filename,
                            plasma_frequency=1.,
                            qmratio=-1.,

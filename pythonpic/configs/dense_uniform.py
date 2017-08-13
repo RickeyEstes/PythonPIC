@@ -41,7 +41,7 @@ scaling = npic# CHECK what should be the proper value here?
 
 category_name = "stability"
 # assert False
-class uniform(Simulation):
+class initial(Simulation):
     def __init__(self, filename, n_macroparticles, n_cells):
         """
         A simulation of laser-hydrogen shield interaction.

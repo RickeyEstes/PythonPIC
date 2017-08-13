@@ -6,7 +6,7 @@ import pytest
 
 from . import on_failure
 from pythonpic.algorithms import BoundaryCondition
-from pythonpic.configs.run_wave import wave_propagation
+from pythonpic.configs.run_wave import initial
 from pythonpic.visualization.plotting import plots
 
 
@@ -53,7 +53,7 @@ def power(request):
 def wave_propagation_helper(shape, intensity, wavelength, power, lasertype):
     laser = lasertype(intensity, wavelength, 10, power, bc_function=shape)
     filename = f"wave_propagation_test_I{intensity}L{wavelength}P{power}"
-    sim = wave_propagation(filename, laser).test_run()
+    sim = initial(filename, laser).test_run()
     return sim, laser
 
 

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from pythonpic.configs.run_laser import laser, npic
+from pythonpic.configs.run_laser import initial, npic
 from pythonpic.helper_functions.physics import electric_charge, electron_rest_mass
 
 from ..helper_functions import physics
@@ -284,7 +284,7 @@ def test_nonperiodic_particles(g_aperiodic):
 #      assert False, plots(sim, show_animation=True, show_static=True, animation_type=Animation.OneDimAnimation, frames="all")
 
 def test_laser_pusher():
-    S = laser("test_current", 0, 1378, 0, 0, 0)
+    S = initial("test_current", 0, 1378, 0, 0, 0)
     p = Particle(S.grid,
                  9.45*S.grid.dx,
                  0,

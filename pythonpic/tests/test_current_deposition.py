@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from matplotlib import pyplot as plt
 
-from pythonpic.configs.run_laser import laser, npic, number_cells
+from pythonpic.configs.run_laser import initial, npic, number_cells
 from pythonpic.helper_functions.physics import lightspeed, electric_charge, electron_rest_mass
 
 from pythonpic.helper_functions.helpers import make_sure_path_exists
@@ -306,7 +306,7 @@ if __name__ == '__main__':
     # [9.95, -0.1, np.array([0, 0, 1, 0])], # cases 3, 4
     ])
 def test_longitudinal_current(init_pos, init_vx, target_density):
-    S = laser("test_current", 0, number_cells, 0, 0, 0)
+    S = initial("test_current", 0, number_cells, 0, 0, 0)
     print(f"dx: {S.grid.dx}, dt: {S.grid.dt}, Neuler: {S.grid.NG}")
     p = Particle(S.grid,
                  init_pos*S.grid.dx,
@@ -354,7 +354,7 @@ def test_longitudinal_current_multiples(n):
     investigated_density = np.zeros(4)
     expected_density = np.zeros(4)
     for init_pos, init_vx, expected in paramset:
-        S = laser("test_current", 0, number_cells, 0, 0, 0)
+        S = initial("test_current", 0, number_cells, 0, 0, 0)
         p = Particle(S.grid,
                      init_pos*S.grid.dx,
                      init_vx*lightspeed,
@@ -380,7 +380,7 @@ def test_longitudinal_current_multiples(n):
 #         ]
 #
 #     expected_density = np.zeros(4)
-#     S = laser("test_current", 0, 0, 0, 0)
+#     S = initial("test_current", 0, 0, 0, 0)
 #     init_pos = np.array([params[0] for params in paramset]) * S.grid.dx
 #     init_vx = np.array([params[1] for params in paramset]) * S.grid.c
 #     spec = Species(-electric_charge, electron_rest_mass, 2, S.grid, scaling=npic)
@@ -431,7 +431,7 @@ from itertools import combinations
         ], 2))
 def test_longitudinal_current_multiples_as_species(paramset):
     expected_density = np.zeros(4)
-    S = laser("test_current", 0, number_cells, 0, 0, 0)
+    S = initial("test_current", 0, number_cells, 0, 0, 0)
     init_pos = np.array([params[0] for params in paramset]) * S.grid.dx
     init_vx = np.array([params[1] for params in paramset]) * S.grid.c
     for expected, v in zip([params[2] for params in paramset], init_vx):
@@ -482,7 +482,7 @@ def test_longitudinal_current_multiples_as_species(paramset):
     [9.5, 0.9, np.array([0, 0, 0.550, 0.450, 0])], # c
     ])
 def test_transversal_current(init_pos, init_vx, expected):
-    S = laser("test_current", 0, number_cells, 0, 0, 0)
+    S = initial("test_current", 0, number_cells, 0, 0, 0)
     print(f"dx: {S.grid.dx}, dt: {S.grid.dt}, Neuler: {S.grid.NG}")
     init_vy = 0.01
     p = Particle(S.grid,
