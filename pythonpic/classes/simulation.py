@@ -37,7 +37,6 @@ class Simulation:
         if list_species is None:
             list_species = []
         self.list_species = list_species
-        self.field_energy = np.zeros(self.NT)
         self.filename = config_filename(filename, category_type, config_version)
         self.title = title
         self.git_version = git_version

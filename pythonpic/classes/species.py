@@ -103,6 +103,14 @@ class Species:
         self.postprocessed = False
 
     def prepare_history_arrays_h5py(self, f):
+        """
+        Prepares hdf5 history datasets in a given file.
+
+        Parameters
+        ----------
+        f : h5py.File
+        """
+
         self.file = f
         if "species" not in self.file:
             self.file.create_group("species")
@@ -124,14 +132,32 @@ class Species:
         group.attrs['scaling'] = self.scaling
         group.attrs['postprocessed'] = self.postprocessed
     def apply_bc(self):
-        self.particle_bc(self)
+        """
+        Applies boundary conditions to particles.
+        """
+        self.particle_bc(self) # TODO this is a really thin wrapper
 
     @property
     def gamma(self):
+        """
+
+        alculates the Lorentz factor from the current particle velocity.
+
+        Returns
+        -------
+        gamma: numpy.ndarray
+        """
         return gamma_from_v(self.v, self.c)
 
     @property
     def v_magnitude(self):
+        """
+        Calculates the magnitude of the velocity.
+
+        Returns
+        -------
+        v: numpy.ndarray
+        """
         return np.sqrt(np.sum(self.v**2, axis=1, keepdims=True))
 
     @property
