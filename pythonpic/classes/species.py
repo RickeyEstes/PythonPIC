@@ -57,8 +57,11 @@ class Species:
         name of group
     scaling : float
         number of particles represented by each macroparticle
+    pusher : function
+    individual_diagnostics : bool
+        Set to `True` to save particle position and velocity
     """
-    def __init__(self, q, m, N, grid, name="particles", scaling=1, pusher=rela_boris_push, individual_diagnostics=False, testing=False):
+    def __init__(self, q, m, N, grid, name="particles", scaling=1, pusher=rela_boris_push, individual_diagnostics=False):
         self.q = q
         self.m = m
         self.N = int(N)
@@ -96,9 +99,6 @@ class Species:
         self.N_alive_history = np.zeros(self.NT, dtype=int)
         self.kinetic_energy_history = np.zeros(self.NT+1)
         self.pusher = pusher
-
-        if testing:
-            self.prepare_history_arrays_numpy()
 
         self.postprocessed = False
 
@@ -176,8 +176,8 @@ class Species:
         self.x = (np.linspace(start_moat + Lx / self.N * 1e-10, Lx - end_moat, self.N,
                               endpoint=False) + shift * self.N / Lx / 10) % Lx  # Type:
 
-    def distribute_nonuniformly(self, L, moat_length, ramp_length, plasma_length, resolution_increase=1000,
-                                profile="linear"):
+    def distribute_nonuniformly(self, moat_length, ramp_length, plasma_length,
+                                resolution_increase=1000, profile="linear"):
         dense_x = np.linspace(moat_length*0.95, (moat_length + plasma_length)*1.05, self.N * resolution_increase)
         self.x = density_profiles.generate(dense_x, density_profiles.FDENS, moat_length,
                                            ramp_length,
@@ -233,12 +233,15 @@ class Species:
     def sinusoidal_velocity_perturbation(self, axis: int, amplitude: float, mode: int):
         """
         Displace velocities by a sinusoidal perturbation calculated for each particle.
-        
 
-        :param int axis: axis, for 3d velocities
-        :param float amplitude: of perturbation
-        :param int mode: which mode is excited
-        :param float L: grid length
+        Parameters
+        ----------
+        axis : int
+            direction, for 3d velocities
+        amplitude : float
+        mode : int
+
+
         """
         self.v[:, axis] += amplitude * np.cos(2 * mode * np.pi * self.x / self.grid.L)
 
@@ -246,8 +249,14 @@ class Species:
         """
         Add Gausian noise to particle velocities on
 
-        :param int axis:
-        :param float std: standard deviation of noise
+        Parameters
+        ----------
+        axis :  int
+            direction, for 3d velocities
+        std : float
+            standard deviation of perturbation
+
+
         """
         self.v[:, axis] += np.random.normal(scale=std, size=self.N)
 
@@ -261,7 +270,14 @@ class Species:
     """ DATA ACCESS """
 
     def save_particle_values(self, i: int):
-        """Update the i-th set of particle values"""
+        """
+        Update the i-th set of saved particle values (positions, velocities)
+        and densities on the grid.
+
+        Parameters
+        ----------
+        i : int
+        """
         N_alive = self.x.size
         self.density_history[i] = self.gathered_density[:-1]
         if self.individual_diagnostics and is_this_saved_iteration(i, self.save_every_n_iterations):
@@ -285,6 +301,10 @@ class Species:
 
 
     def postprocess(self):
+        """
+        Perform postprocessing on the `Species`. At the moment, this simply
+        scales the density of macroparticles to the density of real particles.
+        """
         if not self.postprocessed:
             print(f"Postprocessing {self.name}.")
             self.density_history[...] *= self.scaling
@@ -302,15 +322,17 @@ class Species:
 def load_species(f, grid):
     """
     Loads species data from h5py file.
+
     Parameters
     ----------
     f : `h5py.File`
         Data file
-    grid : Grid
+    grid : `Grid`
         grid to load particles onto
+
     Returns
     -------
-
+    list_species : list
     """
     # TODO: could do a for loop here to load multiple species
     list_species = []
@@ -345,7 +367,6 @@ def load_species(f, grid):
     return list_species
 
 class TestSpecies(Species):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.individual_diagnostics:

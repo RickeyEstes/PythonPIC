@@ -106,7 +106,9 @@ class initial(Simulation):
     def grid_species_initialization(self):
         for species in self.list_species:
             print(f"Distributing {species.name} nonuniformly.")
-            species.distribute_nonuniformly(length, moat_length_left_side, preplasma_length, main_plasma_length,profile="exponential")
+            species.distribute_nonuniformly(moat_length_left_side,
+                                            preplasma_length, main_plasma_length,
+                                            profile="exponential")
         print("Finished initial distribution of particles.")
         super().grid_species_initialization()
         print("Finished initialization.")

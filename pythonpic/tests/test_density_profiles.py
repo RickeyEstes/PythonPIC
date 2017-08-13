@@ -35,7 +35,9 @@ def test_density_helper(_fraction, _second_fraction, _profile, _N_particles):
     ramp_length = g.L * _second_fraction
     plasma_length = 2*ramp_length
     # plasma_length = plasma_length if plasma_length > ramp_length else ramp_length
-    s.distribute_nonuniformly(g.L, moat_length, ramp_length, plasma_length, profile=_profile)
+
+    s.distribute_nonuniformly(moat_length, ramp_length, plasma_length,
+                              profile=_profile)
     return s, g, moat_length, plasma_length, _profile
 
 @pytest.mark.parametrize("std", [0.00001])
