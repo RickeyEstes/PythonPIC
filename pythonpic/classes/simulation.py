@@ -121,7 +121,6 @@ class Simulation:
             if not os.path.exists(os.path.dirname(self.filename)):
                 os.makedirs(os.path.dirname(self.filename))
             self.grid_file = h5py.File(self.filename, "w")
-            specgroup = self.grid_file.create_group("species")
             for species in self.list_species:
                 species.prepare_history_arrays_h5py(self.grid_file)
             self.grid.prepare_history_arrays_h5py(self.grid_file)

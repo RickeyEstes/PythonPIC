@@ -1,8 +1,7 @@
 # coding=utf-8
 from pythonpic import plotting_parser
-from pythonpic.configs.run_coldplasma import plots, initial
-from pythonpic.visualization import animation, static_plots
-from pythonpic.helper_functions.physics import epsilon_zero, lightspeed
+from pythonpic.configs.run_coldplasma import initial
+from pythonpic.visualization import static_plots
 import pathlib
 
 args = plotting_parser("Cold plasma oscillations")

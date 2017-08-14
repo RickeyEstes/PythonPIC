@@ -314,7 +314,7 @@ class Species:
             try:
                 self.position_history[index, :saved_particles] = self.x[::save_every_n_particle]
                 self.velocity_history[index, :saved_particles] = self.v[::save_every_n_particle]
-            except ValueError as E:
+            except ValueError:
                 data = N_alive, save_every_n_particle, saved_particles, self.N, self.x.size
                 raise ValueError(data)
         self.N_alive_history[i] = N_alive

@@ -27,7 +27,7 @@ def helper_short_simulation():
 def test_static_plots(helper_short_simulation):
     S = helper_short_simulation
     if S:
-        static = static_plots(S, S.filename.replace(".hdf5", ".png"))
+        static_plots(S, S.filename.replace(".hdf5", ".png"))
         assert True
 
 # def test_animation(helper_short_simulation):

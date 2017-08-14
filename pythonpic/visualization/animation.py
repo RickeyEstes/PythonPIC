@@ -71,7 +71,7 @@ class Animation:
             for result in plot.return_animated():
                 self.updatable.append(result)
 
-    def animate(self, i, verbose=False):
+    def animate(self, i):
         """draws the i-th frame of the simulation"""
         for plot in self.plots:
             plot.update(i)

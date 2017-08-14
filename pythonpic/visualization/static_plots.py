@@ -41,7 +41,7 @@ def ESE_time_plots(S, axis):
     # wavelengths = 2 * np.pi / S.grid.k_plot
 
     top_values = data.max(axis=0)
-    sorted_indices = np.argsort(top_values)
+    # sorted_indices = np.argsort(top_values)
     # weights = (data ** 2).sum(axis=0) / (data ** 2).sum()
     #
     # # noinspection PyUnusedLocal
@@ -67,7 +67,7 @@ def ESE_time_plots(S, axis):
     axis.set_title("Energy per spatial longitudinal mode versus time")
 
 
-def temperature_time_plot(S, axis, twinaxis=True):
+def temperature_time_plot(S, axis):
     from matplotlib.font_manager import FontProperties
     fontP = FontProperties()
     fontP.set_size('small')

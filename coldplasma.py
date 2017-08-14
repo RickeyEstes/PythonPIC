@@ -2,7 +2,6 @@
 from pythonpic import plotting_parser
 from pythonpic.configs.run_coldplasma import plots, initial
 from pythonpic.visualization import animation
-from pythonpic.helper_functions.physics import epsilon_zero, lightspeed
 
 
 args = plotting_parser("Cold plasma oscillations")

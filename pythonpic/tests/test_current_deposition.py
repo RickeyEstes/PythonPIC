@@ -199,7 +199,6 @@ def test_many_particles_deposition(N, _velocity):
     s.v[:, 0] = _velocity
     s.v[:, 1] = 1
     s.v[:, 2] = -1
-    dt = g.dx / s.c
     g.gather_current([s])
     longitudinal_collected_weights = g.current_density_x.sum(axis=0) / s.v[0, 0]
     transversal_collected_weights = g.current_density_yz.sum(axis=0) / s.v[0, 1:]
@@ -234,7 +233,6 @@ def test_many_particles_periodic_deposition(N, _velocity):
     s.v[:, 0] = _velocity
     s.v[:, 1] = 1
     s.v[:, 2] = -1
-    dt = g.dx / s.c
     g.gather_current([s])
     longitudinal_collected_weights = g.current_density_x[1:-2].sum(axis=0) / s.v[0, 0]
     transversal_collected_weights = g.current_density_yz[2:-2].sum(axis=0) / s.v[0, 1:]

@@ -22,9 +22,9 @@ class BC:
         E[self.index] = self.E_values(t)
         B[self.index] = self.B_values(t)
     def E_values(self, t):
-        return (0, 0, 0)
+        return 0, 0, 0
     def B_values(self, t):
-        return (0, 0, 0)
+        return 0, 0, 0
 
 class Laser(BC):
     """
@@ -126,20 +126,20 @@ class LaserEy(Laser):
         super().__init__(*args, **kwargs)
 
     def E_values(self, t):
-        return (0, self.bc_function(t), 0)
+        return 0, self.bc_function(t), 0
 
     def B_values(self, t):
-        return (0, 0, self.bc_function(t)/self.c)
+        return 0, 0, self.bc_function(t) / self.c
 
 class LaserEz(Laser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def E_values(self, t):
-        return (0, 0, self.bc_function(t))
+        return 0, 0, self.bc_function(t)
 
     def B_values(self, t):
-        return (0, self.bc_function(t)/self.c, 0)
+        return 0, self.bc_function(t) / self.c, 0
 
 class LaserCircular(Laser):
     def __init__(self, *args, **kwargs):
@@ -152,11 +152,11 @@ class LaserCircular(Laser):
     def E_values(self, t):
         bc = self.bc_function(t) * 2 **-0.5
         phase = self.polarisation_phase(t)
-        return (0, bc * np.cos(phase), bc * np.sin(phase))
+        return 0, bc * np.cos(phase), bc * np.sin(phase)
 
     def B_values(self, t):
         bc = self.bc_function(t) / self.c * 2 **-0.5
         phase = self.polarisation_phase(t)
-        return (0, bc * np.sin(phase), bc * np.cos(phase))
+        return 0, bc * np.sin(phase), bc * np.cos(phase)
 
 bcs = {"Ey": LaserEy, "Ez": LaserEz, "Circular": LaserCircular}

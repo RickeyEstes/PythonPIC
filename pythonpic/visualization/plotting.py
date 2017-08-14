@@ -24,7 +24,8 @@ def plots(file,
           frames="few"
           ):
     """
-    Wrapper to run visual analysis on saved hdf5 file. Displays static plots and animations.
+    Wrapper to run visual analysis on saved hdf5 file. Displays static plots
+    and animations.
 
     Parameters
     ----------
@@ -39,6 +40,7 @@ def plots(file,
     animation_type : `pythonpic.visualization.Animation`
     frames : str
         see docs of `pythonpic.visualization.Animation`
+    static_type
 
     Returns
     -------
