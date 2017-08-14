@@ -100,8 +100,7 @@ class Animation:
         # noinspection PyTypeChecker
         animation_object = anim.FuncAnimation(self.fig, self.animate, interval=100,
                                               frames=self.frames,
-                                              blit=True, init_func=self.init,
-                                              fargs=(save,))
+                                              blit=True, init_func=self.init)
         if save:
             mpl_Writer = anim.writers[writer]
             mpl_writer = mpl_Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800) # TODO: does bitrate matter here

@@ -198,8 +198,8 @@ class Simulation:
         Done on {self.run_date} from git version {self.git_version}
         {self.grid}
         """.strip()
-        for species in self.list_species:
-            result_string = result_string + "\n" + str(species)
+        for i, species in enumerate(self.list_species):
+            result_string += f"\nSpecies {i+1}: {species}"
         return result_string  # REFACTOR: add information from config file (run_coldplasma...)
 
     def __eq__(self, other):
