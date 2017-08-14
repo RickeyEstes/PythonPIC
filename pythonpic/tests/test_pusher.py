@@ -3,17 +3,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from pythonpic.configs.run_laser import initial, npic
-from pythonpic.helper_functions.physics import electric_charge, electron_rest_mass
-
-from ..helper_functions import physics
-from ..algorithms import particle_push
-from ..classes import Species, Particle, Simulation
 from pythonpic.classes import PeriodicTestGrid, NonperiodicTestGrid
 from pythonpic.classes import TestSpecies as Species
+from pythonpic.configs.run_laser import initial, npic
+from pythonpic.helper_functions.physics import electric_charge, \
+    electron_rest_mass
+from ..algorithms import particle_push
+from ..classes import Species, Particle, Simulation
+from ..helper_functions import physics
 
-from pythonpic.visualization.plotting import plots
-from pythonpic.visualization import animation
 atol = 1e-1
 rtol = 1e-4
 
@@ -71,11 +69,13 @@ def plot(t, analytical_result, simulation_result,
 
 
 def test_constant_field(g, _pusher, _N_particles):
+    """Tests non-relativistic movement in constant electric field along the
+    direction of motion. The particle should accelerate uniformly."""
     s = Species(1, 1, _N_particles, g, pusher=_pusher,
                 individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
-    def uniform_field(x):
+    def uniform_field(*args, **kwargs):
         return np.array([[1, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
     x_analytical = 0.5 * (t + g.dt / 2) ** 2 + 0
@@ -91,12 +91,13 @@ def test_constant_field(g, _pusher, _N_particles):
     return Simulation(g, [s])
 
 
-# noinspection PyUnresolvedReferences
 def test_relativistic_constant_field(g, _N_particles):
+    """Tests relativistic movement in constant electric field along the
+    direction of motion."""
     s = Species(1, 1, _N_particles, g, individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
-    def uniform_field(x):
+    def uniform_field(*args, **kwargs):
         return np.array([[1, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
     v_analytical = (t - g.dt / 2) / np.sqrt((t - g.dt / 2) ** 2 + 1)
@@ -114,14 +115,17 @@ def test_relativistic_constant_field(g, _N_particles):
     return Simulation(g, [s])
 
 
-# noinspection PyUnresolvedReferences
 def test_relativistic_magnetic_field(g, _N_particles, _v0):
+    """Tests movement in uniform magnetic field in the z direction. The
+    particle should move in a uniform circle. This also covers the
+    non-relativistic case at small velocities.
+    """
     B0 = 1
     s = Species(1, 1, _N_particles, g, individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
     s.v[:, 1] = _v0
 
-    def uniform_magnetic_field(x):
+    def uniform_magnetic_field(*args, **kwargs):
         return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, B0]], dtype=float)
 
     gamma = physics.gamma_from_v(s.v, s.c)[0,0]
@@ -143,6 +147,8 @@ def test_relativistic_magnetic_field(g, _N_particles, _v0):
 # noinspection PyUnresolvedReferences
 @pytest.mark.parametrize("E0", np.linspace(-10, 10, 10))
 def test_relativistic_harmonic_oscillator(g, _N_particles, E0):
+    """Tests relativistic particle movement in a harmonic oscillator trajectory.
+    The velocity is compared to an analytical result."""
     E0 = 1
     omega = 2 * np.pi / g.T
     s = Species(1, 1, _N_particles, g, individual_diagnostics=True)
@@ -172,10 +178,11 @@ def test_relativistic_harmonic_oscillator(g, _N_particles, E0):
     [4/5, 5/3],
      ])
 def test_gamma(v0, gamma):
+    """Tests calculation of Lorentz factor from given velocity"""
     v = np.array([[v0, 0, 0]])
     assert np.isclose(physics.gamma_from_v(v, 1), gamma)
 
-def no_field(x):
+def no_field(*args, **kwargs):
     return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
 @pytest.mark.parametrize(["v0", "expected_kin"], [
@@ -183,6 +190,7 @@ def no_field(x):
     [4/5, 0.666666],
     ])
 def test_kinetic_energy(g, v0, expected_kin, _N_particles):
+    """Tests kinetic energy calculation as compared to analytical result"""
     s = Particle(g, 0, v0, scaling=_N_particles)
     s.velocity_push(no_field)
     total_expected_kin = expected_kin * _N_particles * g.c**2
@@ -198,6 +206,7 @@ def test_kinetic_energy(g, v0, expected_kin, _N_particles):
     0.9999,
     ])
 def test_high_relativistic_velocity(g, v0):
+    """Tests velocity staying under lightspeed."""
     s = Particle(g, 0, v0)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
@@ -216,10 +225,11 @@ def test_high_relativistic_velocity(g, v0):
 
 @pytest.mark.parametrize("v0", [0.9, 0.99, 0.999, 0.9999])
 def test_high_relativistic_velocity_multidirection(g, v0):
+    """Tests velocity staying under lightspeed for multidirectional cases."""
     s = Particle(g, 0, v0*0.5, v0*0.5, v0*0.5)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
-    def no_field(x):
+    def no_field(*args, **kwargs):
         return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
 
     s.velocity_push(lambda x: no_field(x), -0.5)
@@ -233,6 +243,7 @@ def test_high_relativistic_velocity_multidirection(g, v0):
     assert (s.velocity_history < 1).all(), f"Velocity went over c! Max velocity: {s.velocity_history.max()}"
 
 def test_periodic_particles(g):
+    """Tests that particles on periodic grids don't disappear."""
     s = Species(1, 1, 100, g, individual_diagnostics=True)
     s.distribute_uniformly(g.L)
     s.v[:] = 0.5
@@ -244,6 +255,8 @@ def test_periodic_particles(g):
     assert s.N_alive == s.N, "They're dead, Jim."
 
 def test_nonperiodic_particles(g_aperiodic):
+    """Tests that particles on nonperiodic grids disappear when running out
+    the cell boundaries."""
     g = g_aperiodic
     s = Species(1, 1, 100, g, individual_diagnostics=True)
     s.distribute_uniformly(g.L)
@@ -285,6 +298,7 @@ def test_nonperiodic_particles(g_aperiodic):
 #      assert False, plots(sim, show_animation=True, show_static=True, animation_type=Animation.OneDimAnimation, frames="all")
 
 def test_laser_pusher():
+    """Tests ExB drift for particles."""
     S = initial("test_current", 0, 1378, 0, 0, 0)
     p = Particle(S.grid,
                  9.45*S.grid.dx,
