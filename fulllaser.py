@@ -1,8 +1,6 @@
 # coding=utf-8
 from pythonpic import plotting_parser
-from pythonpic.configs.run_laser import initial, impulse_duration, n_macroparticles, plots, number_cells
-from pythonpic.visualization.plotting import plots as general_plots
-from pythonpic.visualization.animation import ParticleDensityAnimation, FastAnimation, FullAnimation
+from pythonpic.configs.run_laser import initial, impulse_duration, n_macroparticles, number_cells
 
 args = plotting_parser("Hydrogen shield")
 perturbation_amplitude = 0
@@ -15,6 +13,7 @@ for polarization in polarizations:
             [75000, int(number_cells)],
             ]:
             s = initial(f"{number_particles}_{n_cells}_run_{power}_{polarization}", number_particles, n_cells, impulse_duration,
-                        intensity, perturbation_amplitude, laser_polarization=polarization).lazy_run()
-            plots(s, *args, frames="few", animation_type=FullAnimation)
+                        intensity, perturbation_amplitude,
+                        laser_polarization=polarization).lazy_run().plots(*args)
+                # frames="few")
             del s

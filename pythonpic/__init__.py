@@ -1,7 +1,6 @@
 # coding=utf-8
 """A work in progress particle-in-cell code written in Python, optimized for speed as well as readability."""
 
-from .visualization.plotting import plots
 from .helper_functions.helpers import plotting_parser
 from .algorithms import BoundaryCondition
 import sys

@@ -117,9 +117,9 @@ def alternate_energy_time_plots(S, axis, biaxial = False):
         twin.plot(S.t, species.kinetic_energy_history, "--",
                   label="Kin.: {}".format(species.name))
     axis.plot(np.arange(S.NT) * S.dt, S.grid.energy_via_bc_history, "-", label="Energy via Poynting", alpha=0.7)
-    axis.plot(np.arange(S.NT) * S.dt, S.grid.entering_energy_via_bc_history, "-", label="Entering energy via Poynting", alpha=0.7)
-    axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "-", label="Long. E.", alpha=1)
-    axis.plot(np.arange(S.NT) * S.dt, S.grid.perpendicular_energy_history, "-", label="Perp. E.", alpha=1)
+    # axis.plot(np.arange(S.NT) * S.dt, S.grid.entering_energy_via_bc_history, "-", label="Entering energy via Poynting", alpha=0.7)
+    # axis.plot(np.arange(S.NT) * S.dt, S.grid.longitudinal_energy_history, "-", label="Long. E.", alpha=1)
+    # axis.plot(np.arange(S.NT) * S.dt, S.grid.perpendicular_energy_history, "-", label="Perp. E.", alpha=1)
     # twin.plot(np.arange(S.NT) * S.dt, S.grid.laser_energy_history, "m-", label="Laser E.")
     axis.grid()
     axis.set_xlabel(r"Time $t$")
@@ -129,7 +129,7 @@ def alternate_energy_time_plots(S, axis, biaxial = False):
     if biaxial:
         twin.legend(loc='lower right')
         twin.set_ylabel("Kinetic energy")
-    axis.set_title("Energy evolution - alternate")
+    axis.set_title("Energy evolution")
     axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
 def electrostatic_energy_time_plots(S, axis):
     for species in S.list_species:
@@ -316,9 +316,9 @@ def static_plots_large(S, filename=None):
     time_fig, axes = static_plot_window(S, 3, 2)
 
     temperature_time_plot(S, axes[1][0])
-    energy_time_plots(S, axes[2][0])
+    alternate_energy_time_plots(S, axes[2][0])
     total_velocity_time_plots(S, axes[0][0])
-    # energy_time_plots(S, axes[0][0], biaxial=True)
+    # alternate_energy_time_plots(S, axes[2][1])
     for i in range(3):
         directional_velocity_time_plots(S, axes[i][1], i)
         axes[i][1].yaxis.tick_right()

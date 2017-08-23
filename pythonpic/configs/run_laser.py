@@ -7,9 +7,7 @@ from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, li
     critical_density
 
 from functools import partial
-from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation, static_plots
-plots = partial(plots, animation_type = animation.FullAnimation, static_type = static_plots.static_plots_large, alpha=0.3)
 
 VERSION = 32
 laser_wavelength = 1.064e-6 # meters
@@ -113,3 +111,7 @@ class initial(Simulation):
         print("Finished initial distribution of particles.")
         super().grid_species_initialization()
         print("Finished initialization.")
+
+    def plots(self, *args, **kwargs):
+        super(initial, self).plots(*args, **kwargs, animation_type =
+            animation.FullAnimation, static_type=static_plots.electrostatic_static_plots)

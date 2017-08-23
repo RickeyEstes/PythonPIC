@@ -1,6 +1,6 @@
 # coding=utf-8
 from pythonpic import plotting_parser
-from pythonpic.configs.run_coldplasma import plots, initial
+from pythonpic.configs.run_coldplasma import initial
 from pythonpic.visualization import animation
 
 
@@ -18,12 +18,26 @@ epsilon_zero = 1
 S = initial(f"CO_LINEAR", qmratio=qmratio, plasma_frequency=plasma_frequency, NG=NG,
             N_electrons=N_electrons, epsilon_zero=epsilon_zero, push_mode=push_mode,
             push_amplitude=0.1,
-            save_data=False, T = T, scaling=scaling, c=c).run()
-plots(S, *args, animation_type = animation.OneDimAnimation, alpha=0.3)
+            save_data=False, T = T, scaling=scaling, c=c).lazy_run().plots(
+    *args, animation_type = animation.OneDimAnimation, alpha=0.3)
+
+S = initial(f"CO_NONLINEAR3_1_DOUBLE_RES", qmratio=qmratio,
+            plasma_frequency=plasma_frequency, NG=NG*2,
+            N_electrons=N_electrons, epsilon_zero=epsilon_zero, push_mode=1,
+            push_amplitude=0.3,
+            save_data=False, T = T, scaling=scaling, c=c).lazy_run().\
+    plots(*args, animation_type = animation.OneDimAnimation, alpha=0.3)
+
+S = initial(f"CO_NONLINEAR4", qmratio=qmratio,
+            plasma_frequency=plasma_frequency, NG=NG,
+            N_electrons=N_electrons, epsilon_zero=epsilon_zero, push_mode=push_mode,
+            push_amplitude=0.4,
+            save_data=False, T = T, scaling=scaling, c=c).lazy_run().\
+    plots(*args, animation_type = animation.OneDimAnimation, alpha=0.3)
 
 S = initial(f"CO_NONLINEAR", qmratio=qmratio, plasma_frequency=plasma_frequency, NG=NG,
             N_electrons=N_electrons, epsilon_zero=epsilon_zero, push_mode=push_mode,
             push_amplitude=0.8,
-            save_data=False, T = T, scaling=scaling, c=c).run()
-plots(S, *args, animation_type = animation.OneDimAnimation, alpha=0.3)
+            save_data=False, T = T, scaling=scaling, c=c).lazy_run().plots(
+    *args, animation_type = animation.OneDimAnimation, alpha=0.3)
 

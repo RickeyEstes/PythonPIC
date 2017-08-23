@@ -5,10 +5,12 @@ import time
 
 import h5py
 import numpy as np
+import matplotlib.pyplot as plt
 
 from .grid import Grid, load_grid
 from .species import load_species
 from ..helper_functions.helpers import report_progress, git_version, config_filename
+from ..visualization import animation, static_plots
 
 
 current_time = time.strftime("%Y-%m-%d %H:%M")
@@ -170,6 +172,68 @@ class Simulation:
             pass
         result = self.run().postprocess()
         return result
+
+    def plots(S,
+              show_static: bool = False,
+              save_static: bool = False,
+              show_animation: bool = False,
+              save_animation: bool = False,
+              snapshot_animation: bool = False,
+              alpha: float = 0.7,
+              animation_type=animation.FullAnimation,
+              static_type = static_plots.static_plots_large,
+              frames="few"
+              ):
+        """
+        Wrapper to run visual analysis on saved hdf5 file. Displays static plots
+        and animations.
+
+        Parameters
+        ----------
+        file : str or simulation.Simulation
+        show_static : bool
+        save_static : bool
+        show_animation : bool
+        save_animation : bool
+        snapshot_animation : bool
+        alpha : float
+            Used for opacity in plots
+        animation_type : `pythonpic.visualization.Animation`
+        frames : str
+            see docs of `pythonpic.visualization.Animation`
+        static_type
+
+        Returns
+        -------
+
+        """
+        if "DISPLAY" not in os.environ.keys():
+            print("Can't plot, DISPLAY not defined!")
+            return False
+        if show_static or show_animation or save_animation or save_static or snapshot_animation:
+            S.postprocess()
+            if show_animation or save_animation or snapshot_animation:
+                # noinspection PyUnusedLocal
+                # this needs name due to matplotlib.animation
+                anim = animation_type(S, alpha, frames)
+                if snapshot_animation:
+                    anim.snapshot_animation()
+                if save_animation or show_animation:
+                    anim_object = anim.full_animation(save_animation)
+            if save_static or show_static:
+                filename = S.filename.replace(".hdf5", ".png") if save_static else None
+                static = static_type(S, filename)
+                if not show_static:
+                    plt.close(static)
+            if show_animation or show_static:
+                try:
+                    plt.show()
+                except KeyboardInterrupt:
+                    print("Quitting.")
+                    plt.close("all")
+            else:
+                plt.close("all")
+
 
 
     def save_data(self):
