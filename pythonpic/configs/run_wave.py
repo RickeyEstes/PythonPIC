@@ -7,9 +7,7 @@ from ..classes import PeriodicGrid, Simulation
 VERSION = 2
 
 from functools import partial
-from ..visualization.plotting import plots
 from ..visualization import animation
-plots = partial(plots, animation_type = animation.FastAnimation)
 
 class initial(Simulation):
     def __init__(self, filename,

@@ -112,6 +112,3 @@ class initial(Simulation):
         super().grid_species_initialization()
         print("Finished initialization.")
 
-    def plots(self, *args, **kwargs):
-        super(initial, self).plots(*args, **kwargs, animation_type =
-            animation.FullAnimation, static_type=static_plots.electrostatic_static_plots)

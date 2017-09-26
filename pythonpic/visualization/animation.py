@@ -4,6 +4,7 @@
 import matplotlib.animation as anim
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import gridspec
 
 from .time_snapshots import FrequencyPlot, \
     PhasePlot, SpatialDistributionPlot, IterationCounter, \
@@ -122,7 +123,6 @@ class Animation:
             self.fig.savefig(file_name)
         return self.fig
 
-from matplotlib import gridspec
 class FullAnimation(Animation):
     def __init__(self, S, alpha=1, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
@@ -184,6 +184,50 @@ class FastAnimation(Animation):
                  field_plots]
         super().add_plots(plots)
 
+class OneDimPhaseAnim(Animation):
+    def __init__(self, S, alpha=0.6, frames="few"):
+        super().__init__(S, alpha=alpha, frames=frames)
+        self.fig.suptitle("")
+        phase_axes_x = self.fig.add_subplot(111)
+
+        if any([species.individual_diagnostics for species in S.list_species]):
+            phase_plot_x = PhasePlot(self.S, phase_axes_x, "x", "v_x", self.alpha)
+            plots = [phase_plot_x]
+        else:
+            raise UserWarning("You need diagnostics here!")
+
+        super().add_plots(plots)
+        self.fig.tight_layout()
+
+class OneDimGridAnim(Animation):
+    def __init__(self, S, alpha=0.6, frames="few"):
+        super().__init__(S, alpha=alpha, frames=frames)
+        self.fig.suptitle("")
+        field_axis = self.fig.add_subplot(121)
+        density_axis = self.fig.add_subplot(122)
+
+        plots = [
+            FieldPlot(self.S, field_axis, 1),
+            SpatialDistributionPlot(self.S, density_axis)
+            ]
+
+        super().add_plots(plots)
+        self.fig.tight_layout()
+
+class OneDimFieldAnim(Animation):
+    def __init__(self, S, alpha=0.6, frames="few"):
+        super().__init__(S, alpha=alpha, frames=frames)
+        self.fig.suptitle("")
+        field_axis = self.fig.add_subplot(111)
+
+        plots = [
+            FieldPlot(self.S, field_axis, 1),
+            ]
+
+        super().add_plots(plots)
+        self.fig.tight_layout()
+
+
 class OneDimAnimation(Animation):
     def __init__(self, S, alpha=0.6, frames="few"):
         super().__init__(S, alpha=alpha, frames=frames)
@@ -215,6 +259,7 @@ class OneDimAnimation(Animation):
                  current_plot,
                  field_plot]
         super().add_plots(plots)
+
 
 class ParticleDensityAnimation(Animation):
     def __init__(self, S, alpha, frames="few"):

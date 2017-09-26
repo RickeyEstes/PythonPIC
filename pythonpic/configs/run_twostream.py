@@ -6,9 +6,7 @@ from ..classes import PeriodicGrid, Simulation, Species
 from ..helper_functions import physics
 
 from functools import partial
-from ..visualization.plotting import plots
 from ..visualization import animation, static_plots
-plots = partial(plots, animation_type = animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
 
 def stability_condition(k0, v0, w0):
     dimensionless_number = k0 * v0 / w0
@@ -72,6 +70,7 @@ class initial(Simulation):
         self.push_mode = push_mode
         self.push_amplitude = push_amplitude
         super().__init__(grid, list_species, filename=filename, category_type="twostream", title=description)
+
 
     def grid_species_initialization(self):
         for i, species in enumerate(self.list_species):

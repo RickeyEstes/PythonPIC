@@ -235,6 +235,25 @@ class Simulation:
                 plt.close("all")
 
 
+    def plots_1d(self, *args, **kwargs):
+        self.plots(*args, **kwargs, animation_type =
+            animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
+
+    def plots_3d(self, *args, **kwargs):
+        self.plots(*args, **kwargs, animation_type =
+            animation.FullAnimation, static_type=static_plots.static_plots)
+
+    def phase_1d(self, *args, **kwargs):
+        self.plots(*args, **kwargs, animation_type =
+            animation.OneDimPhaseAnim, static_type=static_plots.static_plots)
+    
+    def grid_1d(self, *args, **kwargs):
+        self.plots(*args, **kwargs, animation_type =
+            animation.OneDimGridAnim, static_type=static_plots.static_plots)
+
+    def wave_1d(self, *args, **kwargs):
+        self.plots(*args, **kwargs, animation_type =
+            animation.OneDimFieldAnim, static_type=static_plots.static_plots)
 
     def save_data(self):
         """Save simulation data to hdf5.
