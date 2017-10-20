@@ -8,7 +8,6 @@ from pythonpic.configs.run_laser import initial, npic, number_cells
 from pythonpic.helper_functions.physics import lightspeed, electric_charge, electron_rest_mass
 
 from pythonpic.helper_functions.helpers import make_sure_path_exists
-from pythonpic.visualization.plotting import plots
 from pythonpic.visualization import animation
 from pythonpic.algorithms.current_deposition import longitudinal_current_deposition, transversal_current_deposition
 from pythonpic.classes import Particle, Species, Simulation

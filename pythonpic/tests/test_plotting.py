@@ -7,7 +7,6 @@ from time import time
 
 from ..helper_functions import helpers
 from ..configs.run_coldplasma import initial
-from ..visualization.plotting import plots
 from ..visualization import animation
 from ..visualization.static_plots import static_plots
 from pythonpic.classes import TestSpecies as Species
