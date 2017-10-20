@@ -174,7 +174,7 @@ class Simulation:
         return result
 
     # noinspection PyUnusedLocal
-    def plots(S,
+    def plots(self,
               show_static: bool = False,
               save_static: bool = False,
               show_animation: bool = False,
@@ -191,7 +191,6 @@ class Simulation:
 
         Parameters
         ----------
-        file : str or simulation.Simulation
         show_static : bool
         save_static : bool
         show_animation : bool
@@ -212,16 +211,16 @@ class Simulation:
             print("Can't plot, DISPLAY not defined!")
             return False
         if show_static or show_animation or save_animation or save_static or snapshot_animation:
-            S.postprocess()
+            self.postprocess()
             if show_animation or save_animation or snapshot_animation:
-                anim = animation_type(S, alpha, frames)
+                anim = animation_type(self, alpha, frames)
                 if snapshot_animation:
                     anim.snapshot_animation()
                 if save_animation or show_animation:
                     anim_object = anim.full_animation(save_animation)
             if save_static or show_static:
-                filename = S.filename.replace(".hdf5", ".png") if save_static else None
-                static = static_type(S, filename)
+                filename = self.filename.replace(".hdf5", ".png") if save_static else None
+                static = static_type(self, filename)
                 if not show_static:
                     plt.close(static)
             if show_animation or show_static:

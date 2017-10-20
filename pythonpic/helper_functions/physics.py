@@ -52,7 +52,6 @@ def get_dominant_mode(S):
     :return: number of dominant mode
     :rtype: int
     """
-    S.grid.postprocess_fourier()
     data = S.grid.longitudinal_energy_per_mode_history[...]
     weights = (data ** 2).sum(axis=0) / (data ** 2).sum()
 

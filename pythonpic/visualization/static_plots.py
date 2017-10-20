@@ -36,7 +36,7 @@ def static_plot_window(S, N, M):
 
 
 # REFACTOR: turn these into classes like in Animation
-def ESE_time_plots(S, axis):
+def electrostatic_energy_time_plots_alternate(S, axis):
     data = S.grid.longitudinal_energy_per_mode_history
     # wavelengths = 2 * np.pi / S.grid.k_plot
 
@@ -131,6 +131,7 @@ def alternate_energy_time_plots(S, axis, biaxial = False):
         twin.set_ylabel("Kinetic energy")
     axis.set_title("Energy evolution")
     axis.ticklabel_format(style='sci', axis='y', scilimits=(0, 0), useMathText=True, useOffset=False)
+
 def electrostatic_energy_time_plots(S, axis):
     for species in S.list_species:
         axis.plot(S.t, species.kinetic_energy_history, "-",

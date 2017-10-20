@@ -21,7 +21,7 @@ def test_linear_dominant_mode(push_mode):
     calculated_dominant_mode = get_dominant_mode(S)
     assert (calculated_dominant_mode == push_mode) or (calculated_dominant_mode % push_mode == 0), (
         f"got {calculated_dominant_mode} instead of {push_mode}",
-        plots(S, show_animation=True))
+        S.plots(show_animation=True))
 
 
 # # TODO: this setup is actually unstable

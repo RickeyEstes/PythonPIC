@@ -17,7 +17,7 @@ rtol = 1e-4
 
 
 @pytest.fixture(params=[1, 2, 3, 10, 100])
-def _N_particles(request):
+def _n_particles(request):
     return request.param
 
 
@@ -68,10 +68,10 @@ def plot(t, analytical_result, simulation_result,
     return message
 
 
-def test_constant_field(g, _pusher, _N_particles):
+def test_constant_field(g, _pusher, _n_particles):
     """Tests non-relativistic movement in constant electric field along the
     direction of motion. The particle should accelerate uniformly."""
-    s = Species(1, 1, _N_particles, g, pusher=_pusher,
+    s = Species(1, 1, _n_particles, g, pusher=_pusher,
                 individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
@@ -91,10 +91,10 @@ def test_constant_field(g, _pusher, _N_particles):
     return Simulation(g, [s])
 
 
-def test_relativistic_constant_field(g, _N_particles):
+def test_relativistic_constant_field(g, _n_particles):
     """Tests relativistic movement in constant electric field along the
     direction of motion."""
-    s = Species(1, 1, _N_particles, g, individual_diagnostics=True)
+    s = Species(1, 1, _n_particles, g, individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
     def uniform_field(*args, **kwargs):
@@ -115,13 +115,13 @@ def test_relativistic_constant_field(g, _N_particles):
     return Simulation(g, [s])
 
 
-def test_relativistic_magnetic_field(g, _N_particles, _v0):
+def test_relativistic_magnetic_field(g, _n_particles, _v0):
     """Tests movement in uniform magnetic field in the z direction. The
     particle should move in a uniform circle. This also covers the
     non-relativistic case at small velocities.
     """
     B0 = 1
-    s = Species(1, 1, _N_particles, g, individual_diagnostics=True)
+    s = Species(1, 1, _n_particles, g, individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
     s.v[:, 1] = _v0
 
@@ -146,12 +146,12 @@ def test_relativistic_magnetic_field(g, _N_particles, _v0):
 
 # noinspection PyUnresolvedReferences
 @pytest.mark.parametrize("E0", np.linspace(-10, 10, 10))
-def test_relativistic_harmonic_oscillator(g, _N_particles, E0):
+def test_relativistic_harmonic_oscillator(g, _n_particles, E0):
     """Tests relativistic particle movement in a harmonic oscillator trajectory.
     The velocity is compared to an analytical result."""
     E0 = 1
     omega = 2 * np.pi / g.T
-    s = Species(1, 1, _N_particles, g, individual_diagnostics=True)
+    s = Species(1, 1, _n_particles, g, individual_diagnostics=True)
     t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
     t_s = t - g.dt / 2
@@ -189,11 +189,11 @@ def no_field(*args, **kwargs):
     [3/5, 0.25],
     [4/5, 0.666666],
     ])
-def test_kinetic_energy(g, v0, expected_kin, _N_particles):
+def test_kinetic_energy(g, v0, expected_kin, _n_particles):
     """Tests kinetic energy calculation as compared to analytical result"""
-    s = Particle(g, 0, v0, scaling=_N_particles)
+    s = Particle(g, 0, v0, scaling=_n_particles)
     s.velocity_push(no_field)
-    total_expected_kin = expected_kin * _N_particles * g.c**2
+    total_expected_kin = expected_kin * _n_particles * g.c**2
     assert np.isclose(total_expected_kin, s.energy)
     assert np.isclose(total_expected_kin, s.kinetic_energy)
 
@@ -208,8 +208,6 @@ def test_kinetic_energy(g, v0, expected_kin, _N_particles):
 def test_high_relativistic_velocity(g, v0):
     """Tests velocity staying under lightspeed."""
     s = Particle(g, 0, v0)
-    t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
-
 
     s.velocity_push(lambda x: no_field(x), -0.5)
     for i in range(g.NT):
@@ -227,7 +225,6 @@ def test_high_relativistic_velocity(g, v0):
 def test_high_relativistic_velocity_multidirection(g, v0):
     """Tests velocity staying under lightspeed for multidirectional cases."""
     s = Particle(g, 0, v0*0.5, v0*0.5, v0*0.5)
-    t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
 
     def no_field(*args, **kwargs):
         return np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)

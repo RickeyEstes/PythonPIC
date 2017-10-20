@@ -1,7 +1,7 @@
 # coding=utf-8
 import pytest
 import numpy as np
-from ..run_beamplasma import initial, plots
+from ..run_beamplasma import initial
 from pythonpic.helper_functions.physics import did_it_thermalize
 from . import on_failure
 #
@@ -13,4 +13,4 @@ def test_twostream_likeness(L, T, should_it_thermalize):
     run_name = f"BP_TWOSTREAM_{L}"
     S = initial(run_name, L=L, T=T).test_run()
     assert (did_it_thermalize(S)[:2] == should_it_thermalize).all(), ("Incorrect thermalization",
-                                                                      plots(S, *on_failure, alpha=0.5))
+                                                                      S.plots(*on_failure, alpha=0.5))
