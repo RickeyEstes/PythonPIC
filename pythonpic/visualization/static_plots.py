@@ -40,7 +40,7 @@ def ESE_time_plots(S, axis):
     data = S.grid.longitudinal_energy_per_mode_history
     # wavelengths = 2 * np.pi / S.grid.k_plot
 
-    top_values = data.max(axis=0)
+    # top_values = data.max(axis=0)
     # sorted_indices = np.argsort(top_values)
     # weights = (data ** 2).sum(axis=0) / (data ** 2).sum()
     #

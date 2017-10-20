@@ -1,13 +1,11 @@
 """ Run wave propagation"""
 # coding=utf-8
 from ..algorithms import BoundaryCondition
-from ..helper_functions import physics
 from ..classes import PeriodicGrid, Simulation
+from ..helper_functions import physics
 
 VERSION = 2
 
-from functools import partial
-from ..visualization import animation
 
 class initial(Simulation):
     def __init__(self, filename,

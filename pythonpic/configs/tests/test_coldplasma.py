@@ -4,7 +4,7 @@ import pytest
 
 from . import on_failure
 from pythonpic.helper_functions.physics import get_dominant_mode
-from ..run_coldplasma import initial, plots
+from ..run_coldplasma import initial
 
 
 @pytest.mark.parametrize("push_mode", range(1, 10, 2))

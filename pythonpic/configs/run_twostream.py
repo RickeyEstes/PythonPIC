@@ -5,8 +5,6 @@ import numpy as np
 from ..classes import PeriodicGrid, Simulation, Species
 from ..helper_functions import physics
 
-from functools import partial
-from ..visualization import animation, static_plots
 
 def stability_condition(k0, v0, w0):
     dimensionless_number = k0 * v0 / w0

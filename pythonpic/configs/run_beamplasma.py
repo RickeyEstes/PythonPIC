@@ -4,11 +4,6 @@ import numpy as np
 
 from ..classes import PeriodicGrid, Simulation, Species
 
-from functools import partial
-from ..visualization.plotting import plots
-from ..visualization import animation, static_plots
-plots = partial(plots, animation_type = animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
-
 class initial(Simulation):
     def __init__(self, filename,
                          plasma_frequency=1,

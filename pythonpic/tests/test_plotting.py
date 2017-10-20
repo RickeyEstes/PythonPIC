@@ -1,15 +1,14 @@
 # coding=utf-8
-import pytest
 import os
-from matplotlib import animation as mpl_anim
-import numpy as np
 from time import time
 
-from ..helper_functions import helpers
+import numpy as np
+import pytest
+
 from ..configs.run_coldplasma import initial
+from ..helper_functions import helpers
 from ..visualization import animation
 from ..visualization.static_plots import static_plots
-from pythonpic.classes import TestSpecies as Species
 
 
 @pytest.fixture(scope="module")

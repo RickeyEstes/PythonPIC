@@ -1,8 +1,7 @@
 # coding=utf-8
 
-import pytest
 import numpy as np
-from matplotlib import pyplot as plt
+
 from pythonpic.algorithms import BoundaryCondition
 
 laser = BoundaryCondition.LaserCircular(1, 1)

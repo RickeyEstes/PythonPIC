@@ -4,8 +4,6 @@ from numpy import pi
 
 from ..classes import PeriodicGrid, Simulation, Species
 
-from functools import partial
-from ..visualization import animation, static_plots
 
 class initial(Simulation):
     def __init__(self, filename,
@@ -82,10 +80,6 @@ class initial(Simulation):
 
         super().__init__(grid, list_species, filename=filename, category_type="coldplasma", title=description)
         
-    def plots(self, *args, **kwargs):
-        super(initial, self).plots(*args, **kwargs, animation_type = 
-        animation.OneDimAnimation, static_type=static_plots.electrostatic_static_plots)
-
     def grid_species_initialization(self):
         for species in self.list_species:
             species.distribute_uniformly(self.grid.L)

@@ -1,9 +1,6 @@
 # coding=utf-8
 from pythonpic import plotting_parser
-from pythonpic.helper_functions.physics import did_it_thermalize
 from pythonpic.configs.run_twostream import initial
-from pythonpic.visualization import animation, static_plots
-
 
 args = plotting_parser("Two stream instability")
 

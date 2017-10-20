@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from ..classes import Simulation
-from pythonpic.classes import PeriodicTestGrid, NonperiodicTestGrid
-from pythonpic.classes import TestSpecies as Species
+from ..classes import Simulation, PeriodicTestGrid, NonperiodicTestGrid
 from ..visualization.time_snapshots import FieldPlot, CurrentPlot
 
 

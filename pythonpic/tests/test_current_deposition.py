@@ -4,15 +4,14 @@ import pandas as pd
 import pytest
 from matplotlib import pyplot as plt
 
-from pythonpic.configs.run_laser import initial, npic, number_cells
-from pythonpic.helper_functions.physics import lightspeed, electric_charge, electron_rest_mass
-
-from pythonpic.helper_functions.helpers import make_sure_path_exists
-from pythonpic.visualization import animation
-from pythonpic.algorithms.current_deposition import longitudinal_current_deposition, transversal_current_deposition
-from pythonpic.classes import Particle, Species, Simulation
-from pythonpic.classes import PeriodicTestGrid, NonperiodicTestGrid
+from pythonpic.algorithms.current_deposition import \
+    longitudinal_current_deposition, transversal_current_deposition
+from pythonpic.classes import Particle, PeriodicTestGrid, NonperiodicTestGrid
 from pythonpic.classes import TestSpecies as Species
+from pythonpic.configs.run_laser import initial, npic, number_cells
+from pythonpic.helper_functions.helpers import make_sure_path_exists
+from pythonpic.helper_functions.physics import lightspeed, electric_charge, \
+    electron_rest_mass
 
 
 @pytest.fixture(params=np.arange(3, 4, 0.2))
@@ -324,51 +323,52 @@ def test_longitudinal_current(init_pos, init_vx, target_density):
                         "error %":error}))
     assert np.allclose(target_density, investigated_density, rtol=1e-2, atol = 1e-3)
 
-import random
-@pytest.mark.parametrize("n", range(200))
-def test_longitudinal_current_multiples(n):
-    parameters = [
-        [9.45, 0.9, np.array([0, 0.056, 0.944, 0])], # cases 3, 4
-        [9.55, 0.9, np.array([0, 0, 1, 0])], # cases 3, 4
-        [9.95, 0.9, np.array([0, 0, 0.611, 0.389])], # cases 3, 4
-        [9.05, 0.9, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
-        [9.45, -0.9, np.array([0, 1, 0, 0])], # cases 1, 2
-        [9.55, -0.9, np.array([0, 0.944, 0.056, 0])], # cases 1, 2
-        [9.95, -0.9, np.array([0, 0.5, 0.5, 0])], # cases 1, 2
-        [9.05, -0.9, np.array([0.389, 0.611, 0, 0])], # cases 1, 2
-
-        [9.05, 0.1, np.array([0, 1, 0, 0])], # cases 3, 4
-        [9.45, 0.1, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
-        [9.55, 0.1, np.array([0, 0, 1, 0])], # cases 3, 4
-        [9.95, 0.1, np.array([0, 0, 1, 0])], # cases 3, 4
-        [9.05, -0.1, np.array([0, 1, 0, 0])], # cases 3, 4
-        [9.45, -0.1, np.array([0, 1, 0, 0])], # cases 3, 4
-        [9.55, -0.1, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
-        [9.95, -0.1, np.array([0, 0, 1, 0])], # cases 3, 4
-        ]
-    paramset = random.choices(parameters, k=2)
-
-    investigated_density = np.zeros(4)
-    expected_density = np.zeros(4)
-    for init_pos, init_vx, expected in paramset:
-        S = initial("test_current", 0, number_cells, 0, 0, 0)
-        p = Particle(S.grid,
-                     init_pos*S.grid.dx,
-                     init_vx*lightspeed,
-                     q=-electric_charge,
-                     m=electron_rest_mass,
-                     scaling=npic)
-        S.grid.list_species = [p]
-        S.grid.gather_current([p])
-        investigated_density += S.grid.current_density_x[9:13] / (p.eff_q * init_vx * lightspeed)
-        expected_density += expected
-
-    error = error_table(investigated_density, expected_density)
-    print(pd.DataFrame({"indices": np.arange(9, 13)-1,
-                        "found density":investigated_density,
-                        "target density":expected_density,
-                        "error %":error}))
-    assert np.allclose(expected_density, investigated_density, rtol=1e-2, atol = 1e-3)
+# TODO: this is terrible and needs reworking
+# import random
+# @pytest.mark.parametrize("n", range(200))
+# def test_longitudinal_current_multiples(n):
+#     parameters = [
+#         [9.45, 0.9, np.array([0, 0.056, 0.944, 0])], # cases 3, 4
+#         [9.55, 0.9, np.array([0, 0, 1, 0])], # cases 3, 4
+#         [9.95, 0.9, np.array([0, 0, 0.611, 0.389])], # cases 3, 4
+#         [9.05, 0.9, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
+#         [9.45, -0.9, np.array([0, 1, 0, 0])], # cases 1, 2
+#         [9.55, -0.9, np.array([0, 0.944, 0.056, 0])], # cases 1, 2
+#         [9.95, -0.9, np.array([0, 0.5, 0.5, 0])], # cases 1, 2
+#         [9.05, -0.9, np.array([0.389, 0.611, 0, 0])], # cases 1, 2
+#
+#         [9.05, 0.1, np.array([0, 1, 0, 0])], # cases 3, 4
+#         [9.45, 0.1, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
+#         [9.55, 0.1, np.array([0, 0, 1, 0])], # cases 3, 4
+#         [9.95, 0.1, np.array([0, 0, 1, 0])], # cases 3, 4
+#         [9.05, -0.1, np.array([0, 1, 0, 0])], # cases 3, 4
+#         [9.45, -0.1, np.array([0, 1, 0, 0])], # cases 3, 4
+#         [9.55, -0.1, np.array([0, 0.5, 0.5, 0])], # cases 3, 4
+#         [9.95, -0.1, np.array([0, 0, 1, 0])], # cases 3, 4
+#         ]
+#     paramset = random.choices(parameters, k=2)
+#
+#     investigated_density = np.zeros(4)
+#     expected_density = np.zeros(4)
+#     for init_pos, init_vx, expected in paramset:
+#         S = initial("test_current", 0, number_cells, 0, 0, 0)
+#         p = Particle(S.grid,
+#                      init_pos*S.grid.dx,
+#                      init_vx*lightspeed,
+#                      q=-electric_charge,
+#                      m=electron_rest_mass,
+#                      scaling=npic)
+#         S.grid.list_species = [p]
+#         S.grid.gather_current([p])
+#         investigated_density += S.grid.current_density_x[9:13] / (p.eff_q * init_vx * lightspeed)
+#         expected_density += expected
+#
+#     error = error_table(investigated_density, expected_density)
+#     print(pd.DataFrame({"indices": np.arange(9, 13)-1,
+#                         "found density":investigated_density,
+#                         "target density":expected_density,
+#                         "error %":error}))
+#     assert np.allclose(expected_density, investigated_density, rtol=1e-2, atol = 1e-3)
 
 # def test_longitudinal_current_particular():
 #     paramset = [

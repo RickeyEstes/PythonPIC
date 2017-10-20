@@ -2,7 +2,6 @@
 import numpy as np
 from scipy.integrate import quad, cumtrapz
 
-from ..helper_functions import physics
 profiles = {"linear": lambda x: x,
             "quadratic": lambda x: x ** 2,
             "exponential": lambda x: np.exp(10 * (x - 1))}

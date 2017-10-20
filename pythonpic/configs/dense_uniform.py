@@ -9,9 +9,6 @@ from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, li
     electron_rest_mass, \
     critical_density, cold_plasma_frequency
 from pythonpic.visualization import animation
-from pythonpic.visualization.plotting import plots
-
-plots = partial(plots, animation_type = animation.FullAnimation, alpha=0.3)
 
 VERSION = 23
 laser_wavelength = 1.064e-6 # meters

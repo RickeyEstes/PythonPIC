@@ -4,7 +4,7 @@ import numpy as np
 
 from . import on_failure
 from pythonpic.helper_functions.physics import did_it_thermalize
-from ..run_twostream import initial, plots
+from ..run_twostream import initial
 
 
 @pytest.mark.parametrize(["L", "NG", "N_electrons"], [

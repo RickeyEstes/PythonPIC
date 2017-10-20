@@ -1,12 +1,10 @@
 # coding=utf-8
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from ..classes import Simulation
 from pythonpic.classes import PeriodicTestGrid
-from ..visualization.time_snapshots import FieldPlot, CurrentPlot
-from pythonpic.classes import TestSpecies as Species
+from ..classes import Simulation
+
 
 @pytest.fixture(params=[10, 100], scope='module')
 def NG(request):

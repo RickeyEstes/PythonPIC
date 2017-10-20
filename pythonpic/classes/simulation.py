@@ -173,6 +173,7 @@ class Simulation:
         result = self.run().postprocess()
         return result
 
+    # noinspection PyUnusedLocal
     def plots(S,
               show_static: bool = False,
               save_static: bool = False,
@@ -213,8 +214,6 @@ class Simulation:
         if show_static or show_animation or save_animation or save_static or snapshot_animation:
             S.postprocess()
             if show_animation or save_animation or snapshot_animation:
-                # noinspection PyUnusedLocal
-                # this needs name due to matplotlib.animation
                 anim = animation_type(S, alpha, frames)
                 if snapshot_animation:
                     anim.snapshot_animation()

@@ -1,7 +1,6 @@
 # coding=utf-8
 from pythonpic import plotting_parser
-from pythonpic.configs.run_laser import initial, impulse_duration, n_macroparticles, plots, number_cells
-from pythonpic.visualization.plotting import plots as general_plots
+from pythonpic.configs.run_laser import initial, impulse_duration, n_macroparticles, number_cells
 from pythonpic.visualization.animation import ParticleDensityAnimation
 
 args = plotting_parser("Hydrogen shield")

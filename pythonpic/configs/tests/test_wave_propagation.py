@@ -7,7 +7,6 @@ import pytest
 from . import on_failure
 from pythonpic.algorithms import BoundaryCondition
 from pythonpic.configs.run_wave import initial
-from pythonpic.visualization.plotting import plots
 
 
 def plot_all(field_history, analytical_solution):
