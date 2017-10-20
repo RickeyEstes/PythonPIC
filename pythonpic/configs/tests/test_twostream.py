@@ -28,7 +28,8 @@ def test_linear_regime_beam_stability(L, NG, N_electrons):
                 N_electrons=N_electrons,
                 v0 = 0.01,
                 ).test_run()
-    assert (~did_it_thermalize(S)).all(), ("A linear regime run came out unstable.", plots(S, *on_failure))
+    assert (~did_it_thermalize(S)).all(), ("A linear regime run came out "
+                                           "unstable.", S.plots(*on_failure))
 
 
 
@@ -87,4 +88,4 @@ def test_finish():
                 N_electrons=4096,
                 plasma_frequency=0.05 / 4,
                 ).test_run()
-    assert True, ("The simulation did not finish.", plots(S, *on_failure))
+    assert True, ("The simulation did not finish.", S.plots(*on_failure))

@@ -60,13 +60,13 @@ def test_amplitude(wave_propagation_helper):
     run, laser = wave_propagation_helper
     amplitude = laser.laser_amplitude
     max_efield = np.abs(run.grid.electric_field_history).max()
-    assert max_efield < amplitude, plots(run, *on_failure)
+    assert max_efield < amplitude, run.plots(*on_failure)
     # assert max_efield > amplitude*2**-0.5, plots(run, *on_failure)
 
 def test_wave_propagation(wave_propagation_helper):
     run, laser = wave_propagation_helper
     mean_energy = run.grid.grid_energy_history[...].mean()
-    assert mean_energy, plots(run, *on_failure)
+    assert mean_energy, run.plots(*on_failure)
 
 
 def test_polarization_orthogonality(wave_propagation_helper):
