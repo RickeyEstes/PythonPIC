@@ -14,7 +14,7 @@ def NG(request):
 def T(request):
     return request.param
 
-@pytest.fixture(params=[1, 2], scope='module')
+@pytest.fixture(params=[1], scope='module')
 def c(request):
     return request.param
 
@@ -22,7 +22,7 @@ def c(request):
 def L(request):
     return request.param
 
-@pytest.fixture(params=[1, 100], scope='module')
+@pytest.fixture(params=[1], scope='module')
 def epsilon_0(request):
     return request.param
 
