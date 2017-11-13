@@ -74,7 +74,7 @@ def BunemanTransversalSolver(electric_field, magnetic_field, current_yz, dt, c, 
 
 @numba.njit()
 def BunemanLongitudinalSolver(electric_field, current_x, dt, epsilon_0):
-    return electric_field - dt / epsilon_0 * current_x[:-1]
+    electric_field[:, 0] -= dt / epsilon_0 * current_x[:-1]
 
 class Solver:
     def __init__(self, solve_algorithm, initialiation_algorithm):

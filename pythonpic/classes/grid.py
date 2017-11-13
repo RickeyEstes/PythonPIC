@@ -197,8 +197,7 @@ class Grid:
         -------
 
         """
-        self.electric_field[:, 0] = BunemanLongitudinalSolver(self.electric_field[:, 0],
-                                                              self.current_density_x,
+        BunemanLongitudinalSolver(self.electric_field, self.current_density_x,
                                                               self.dt,
                                                               self.epsilon_0,
                                                               )
