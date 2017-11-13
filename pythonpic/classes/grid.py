@@ -8,6 +8,9 @@ from scipy.integrate import cumtrapz, trapz
 from ..helper_functions import physics
 from ..algorithms import charge_deposition, FieldSolver, BoundaryCondition, \
     current_deposition, field_interpolation
+from ..algorithms.FieldSolver import (BunemanLongitudinalSolver,
+                                    BunemanTransversalSolver,
+                                    FourierLongitudinalSolver)
 
 
 class Grid:
@@ -171,12 +174,21 @@ class Grid:
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
-    def init_solve(self):
+    def init_solve(self, neutralize = False):
         """
         Performs the initial, spectral iteration of the field solver.
         See `FieldSolver` for details.
         """
-        return FieldSolver.BunemanSolver.init_solver(self)
+        self.electric_field[1:-1, 0] = FourierLongitudinalSolver(
+            self.charge_density[:-1], self.k, epsilon_0=self.epsilon_0, neutralize=neutralize
+            )
+
+        E, B = BunemanTransversalSolver(self.electric_field[:, 1:],
+                                        self.magnetic_field[:, 1:],
+                                        self.current_density_yz, self.dt,
+                                        self.c, self.epsilon_0)
+
+        self.electric_field[:, 1:], self.magnetic_field[:, 1:] = E, B
 
     def solve(self):
         """
@@ -186,7 +198,16 @@ class Grid:
         -------
 
         """
-        return FieldSolver.BunemanSolver.solve(self)
+        self.electric_field[:, 0] = BunemanLongitudinalSolver(self.electric_field[:, 0],
+                                                              self.current_density_x,
+                                                              self.dt,
+                                                              self.epsilon_0,
+                                                              )
+        E, B =BunemanTransversalSolver(self.electric_field[:, 1:],
+                                       self.magnetic_field[:, 1:],
+                                       self.current_density_yz, self.dt,
+                                       self.c, self.epsilon_0)
+        self.electric_field[:, 1:], self.magnetic_field[:, 1:] = E, B
 
     def direct_energy_calculation(self):
         r"""

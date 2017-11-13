@@ -38,15 +38,33 @@ def FourierLongitudinalSolver(rho, k, epsilon_0=1, neutralize=True):
 
 @numba.njit()
 def BunemanTransversalSolver(electric_field, magnetic_field, current_yz, dt, c, epsilon_0):
+    """
+
+    Parameters
+    ----------
+    electric_field : ndarray
+        the transversal part
+    magnetic_field : ndarray
+        the transversal part
+    current_yz :
+    dt :
+    c :
+    epsilon_0 :
+
+    Returns
+    -------
+
+    """
     # dt = dx/c
     Fplus = 0.5 * (electric_field[:, 0] + c * magnetic_field[:, 1])
     Fminus = 0.5 * (electric_field[:, 0] - c * magnetic_field[:, 1])
     Gplus = 0.5 * (electric_field[:, 1] + c * magnetic_field[:, 0])
     Gminus = 0.5 * (electric_field[:, 1] - c * magnetic_field[:, 0])
 
+    # propagate to front
     Fplus[1:] = Fplus[:-1] - 0.5 * dt * (current_yz[2:-1, 0]) / epsilon_0
-    Fminus[:-1] = Fminus[1:] - 0.5 * dt * (current_yz[1:-2, 0]) / epsilon_0
     Gplus[1:] = Gplus[:-1] - 0.5 * dt * (current_yz[2:-1, 1]) / epsilon_0
+    Fminus[:-1] = Fminus[1:] - 0.5 * dt * (current_yz[1:-2, 0]) / epsilon_0
     Gminus[:-1] = Gminus[1:] - 0.5 * dt * (current_yz[1:-2, 1]) / epsilon_0
 
     new_electric_field = np.zeros_like(electric_field)
@@ -57,7 +75,7 @@ def BunemanTransversalSolver(electric_field, magnetic_field, current_yz, dt, c, 
     new_magnetic_field[:, 0] = (Gplus - Gminus) / c
     new_magnetic_field[:, 1] = (Fplus - Fminus) / c
 
-    return new_electric_field, new_magnetic_field
+    return new_electric_field, new_magnetic_field # TODO this should be inplace
 
 @numba.njit()
 def BunemanLongitudinalSolver(electric_field, current_x, dt, epsilon_0):
@@ -68,35 +86,4 @@ class Solver:
         self.solve = solve_algorithm
         self.init_solver = initialiation_algorithm
 
-
-def solve_fourier(grid, neutralize = False):
-    grid.electric_field[1:-1, 0] = FourierLongitudinalSolver(
-        grid.charge_density[:-1], grid.k, epsilon_0=grid.epsilon_0, neutralize=neutralize
-        )
-
-    E, B = BunemanTransversalSolver(grid.electric_field[:, 1:],
-                                    grid.magnetic_field[:, 1:],
-                                    grid.current_density_yz, grid.dt,
-                                    grid.c, grid.epsilon_0)
-
-    grid.electric_field[:, 1:], grid.magnetic_field[:, 1:] = E, B
-
-solve_fourier_neutral = functools.partial(solve_fourier, neutralize=True)
-
-
-def solve_buneman(grid):
-    grid.electric_field[:, 0] = BunemanLongitudinalSolver(grid.electric_field[:, 0],
-                                                          grid.current_density_x,
-                                                          grid.dt,
-                                                          grid.epsilon_0,
-                                                          )
-    E, B =BunemanTransversalSolver(grid.electric_field[:, 1:],
-                                   grid.magnetic_field[:, 1:],
-                                   grid.current_density_yz, grid.dt,
-                                   grid.c, grid.epsilon_0)
-    grid.electric_field[:, 1:], grid.magnetic_field[:, 1:] = E, B
-
-
-FourierSolver = Solver(solve_fourier_neutral, solve_fourier_neutral)
-BunemanSolver = Solver(solve_buneman, solve_fourier)
 
