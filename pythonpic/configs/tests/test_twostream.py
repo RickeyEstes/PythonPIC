@@ -7,29 +7,29 @@ from pythonpic.helper_functions.physics import did_it_thermalize
 from ..run_twostream import initial
 
 
-@pytest.mark.parametrize(["L", "NG", "N_electrons"], [
-    (2*np.pi/100, 32, 512),
-    (2*np.pi/200, 32, 512),
-    # (200, 5000),
-    # (400, 10000),
-    ])
-def test_linear_regime_beam_stability(L, NG, N_electrons):
-    """Tests the simulation's behavior in modes expected to be linear."""
-    run_name = f"TS_LINEAR_{L}_{NG}_{N_electrons}"
-    dx = L / NG
-    c = 1
-    dt = dx / c
-    T = 50000 * dt
-    # NT = T / dt = 50000 * c / dx = 50000 * c * NG / L
-    S = initial(run_name,
-                NG=NG,
-                L=L,
-                T = T,
-                N_electrons=N_electrons,
-                v0 = 0.01,
-                ).test_run()
-    assert (~did_it_thermalize(S)).all(), ("A linear regime run came out "
-                                           "unstable.", S.plots(*on_failure))
+# @pytest.mark.parametrize(["L", "NG", "N_electrons"], [
+#     (2*np.pi/100, 32, 512),
+#     (2*np.pi/200, 32, 512),
+#     # (200, 5000),
+#     # (400, 10000),
+#     ])
+# def test_linear_regime_beam_stability(L, NG, N_electrons):
+#     """Tests the simulation's behavior in modes expected to be linear."""
+#     run_name = f"TS_LINEAR_{L}_{NG}_{N_electrons}"
+#     dx = L / NG
+#     c = 1
+#     dt = dx / c
+#     T = 50000 * dt
+#     # NT = T / dt = 50000 * c / dx = 50000 * c * NG / L
+#     S = initial(run_name,
+#                 NG=NG,
+#                 L=L,
+#                 T = T,
+#                 N_electrons=N_electrons,
+#                 v0 = 0.01,
+#                 ).test_run()
+#     assert (~did_it_thermalize(S)).all(), ("A linear regime run came out "
+#                                            "unstable.", S.plots(*on_failure))
 
 
 
