@@ -183,12 +183,11 @@ class Grid:
             self.charge_density[:-1], self.k, epsilon_0=self.epsilon_0, neutralize=neutralize
             )
 
-        E, B = BunemanTransversalSolver(self.electric_field[:, 1:],
-                                        self.magnetic_field[:, 1:],
+        BunemanTransversalSolver(self.electric_field,
+                                        self.magnetic_field,
                                         self.current_density_yz, self.dt,
                                         self.c, self.epsilon_0)
 
-        self.electric_field[:, 1:], self.magnetic_field[:, 1:] = E, B
 
     def solve(self):
         """
@@ -203,11 +202,10 @@ class Grid:
                                                               self.dt,
                                                               self.epsilon_0,
                                                               )
-        E, B =BunemanTransversalSolver(self.electric_field[:, 1:],
-                                       self.magnetic_field[:, 1:],
+        BunemanTransversalSolver(self.electric_field,
+                                       self.magnetic_field,
                                        self.current_density_yz, self.dt,
                                        self.c, self.epsilon_0)
-        self.electric_field[:, 1:], self.magnetic_field[:, 1:] = E, B
 
     def direct_energy_calculation(self):
         r"""

@@ -56,10 +56,10 @@ def BunemanTransversalSolver(electric_field, magnetic_field, current_yz, dt, c, 
 
     """
     # dt = dx/c
-    Fplus = 0.5 * (electric_field[:, 0] + c * magnetic_field[:, 1])
-    Fminus = 0.5 * (electric_field[:, 0] - c * magnetic_field[:, 1])
-    Gplus = 0.5 * (electric_field[:, 1] + c * magnetic_field[:, 0])
-    Gminus = 0.5 * (electric_field[:, 1] - c * magnetic_field[:, 0])
+    Fplus = 0.5 * (electric_field[:, 1] + c * magnetic_field[:, 2])
+    Fminus = 0.5 * (electric_field[:, 1] - c * magnetic_field[:, 2])
+    Gplus = 0.5 * (electric_field[:, 2] + c * magnetic_field[:, 1])
+    Gminus = 0.5 * (electric_field[:, 2] - c * magnetic_field[:, 1])
 
     # propagate to front
     Fplus[1:] = Fplus[:-1] - 0.5 * dt * (current_yz[2:-1, 0]) / epsilon_0
@@ -67,15 +67,10 @@ def BunemanTransversalSolver(electric_field, magnetic_field, current_yz, dt, c, 
     Fminus[:-1] = Fminus[1:] - 0.5 * dt * (current_yz[1:-2, 0]) / epsilon_0
     Gminus[:-1] = Gminus[1:] - 0.5 * dt * (current_yz[1:-2, 1]) / epsilon_0
 
-    new_electric_field = np.zeros_like(electric_field)
-    new_magnetic_field = np.zeros_like(magnetic_field)
-
-    new_electric_field[:, 0] = Fplus + Fminus
-    new_electric_field[:, 1] = Gplus + Gminus
-    new_magnetic_field[:, 0] = (Gplus - Gminus) / c
-    new_magnetic_field[:, 1] = (Fplus - Fminus) / c
-
-    return new_electric_field, new_magnetic_field # TODO this should be inplace
+    electric_field[:, 1] = Fplus + Fminus
+    electric_field[:, 2] = Gplus + Gminus
+    magnetic_field[:, 1] = (Gplus - Gminus) / c
+    magnetic_field[:, 2] = (Fplus - Fminus) / c
 
 @numba.njit()
 def BunemanLongitudinalSolver(electric_field, current_x, dt, epsilon_0):
