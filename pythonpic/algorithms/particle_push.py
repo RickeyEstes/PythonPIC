@@ -76,7 +76,7 @@ def rela_boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
 
     """
     # calculate u
-    v /= np.sqrt(1 - ((v ** 2).sum(axis=1, keepdims=True)) / c ** 2)  # below eq 22 LPIC
+    v /= np.sqrt(1 - (v ** 2).sum(axis=1, keepdims=True) / c ** 2)  # below eq 22 LPIC
     half_force = (eff_q * 0.5 / eff_m * dt) * E  # eq. 21 LPIC # array of shape (N_particles, 3)
     # add first half of electric force
 
@@ -85,7 +85,7 @@ def rela_boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
 
     # rotate to add magnetic field
     # this effectively takes relativistic mass into account
-    t = B * eff_q * dt / (2 * eff_m * np.sqrt(1 + ((v ** 2).sum(axis=1, keepdims=True) / c ** 2)))
+    t = B * eff_q * dt / (2 * eff_m * np.sqrt(1 + (v ** 2).sum(axis=1, keepdims=True) / c ** 2))
     # u' = u- + u- x t
     uprime = v + np.cross(v, t)
     # rotate second time, by s = 2t/(1+t*t)
