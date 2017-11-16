@@ -64,6 +64,7 @@ def BunemanTransversalSolver(electric_field, magnetic_field, current_yz, dt, c, 
     # propagate to front
     Fplus[1:] = Fplus[:-1] - 0.5 * dt * (current_yz[2:-1, 0]) / epsilon_0
     Gplus[1:] = Gplus[:-1] - 0.5 * dt * (current_yz[2:-1, 1]) / epsilon_0
+    # propagate to back
     Fminus[:-1] = Fminus[1:] - 0.5 * dt * (current_yz[1:-2, 0]) / epsilon_0
     Gminus[:-1] = Gminus[1:] - 0.5 * dt * (current_yz[1:-2, 1]) / epsilon_0
 
