@@ -2,7 +2,6 @@
 import numpy as np
 # from numba import jit # TODO
 
-c = 299792458 # m /s
 # TODO: this can be optimized plenty
 # @jit()
 def longitudinal_current_deposition(j_x, x_velocity, x_particles, dx, dt, q):
@@ -42,7 +41,7 @@ def longitudinal_current_deposition(j_x, x_velocity, x_particles, dx, dt, q):
             raise Exception("Infinite recurrence!")
         logical_coordinates_n = (x_particles // dx).astype(np.int32)
         particle_in_left_half = x_particles / dx - logical_coordinates_n <= 0.5
-        particle_in_right_half = x_particles / dx - logical_coordinates_n > 0.5 # TODO negate prev`
+        particle_in_right_half = ~particle_in_left_half
         velocity_to_left = x_velocity < 0
         velocity_to_right = x_velocity > 0
 
