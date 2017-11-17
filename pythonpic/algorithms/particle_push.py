@@ -97,7 +97,7 @@ def rela_boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
     # add second half of electric force
     v += half_force
 
-    final_gamma = (1 + ((v ** 2).sum(axis=1, keepdims=True) / c ** 2)).sqrt()
+    final_gamma = np.sqrt(1 + ((v ** 2).sum(axis=1, keepdims=True) / c ** 2))
     v /= final_gamma
     total_velocity = final_gamma - 1
     return total_velocity.sum() * eff_m * c ** 2
