@@ -35,10 +35,12 @@ class Simulation:
         self.NT = grid.NT
         self.dt = grid.dt
         self.t = np.arange(self.NT) * self.dt
+
         self.grid = grid
         if list_species is None:
             list_species = []
         self.list_species = list_species
+
         self.filename = config_filename(filename, category_type, config_version)
         self.title = title
         self.git_version = git_version
@@ -93,7 +95,7 @@ class Simulation:
         self.grid.save_field_values(i)  # CHECK: is this the right place, or after loop?
         self.grid.apply_bc(i)
         for species in self.list_species:
-            species.velocity_push(self.grid.field_function)
+            species.velocity_push(self.grid.field_function) # TODO should be inplace?
         self.grid.gather_charge(self.list_species)
         self.grid.gather_current(self.list_species)
         self.grid.solve()
@@ -102,7 +104,7 @@ class Simulation:
             species.save_particle_values(i)
             species.apply_bc()
 
-    def run(self, init=True) -> float:
+    def run(self, init=True) -> Simulation:
         """
         Run n iterations of the simulation, saving data as it goes.
 
@@ -244,7 +246,7 @@ class Simulation:
     def phase_1d(self, *args, **kwargs):
         self.plots(*args, **kwargs, animation_type =
             animation.OneDimPhaseAnim, static_type=static_plots.static_plots)
-    
+
     def grid_1d(self, *args, **kwargs):
         self.plots(*args, **kwargs, animation_type =
             animation.OneDimGridAnim, static_type=static_plots.static_plots)
