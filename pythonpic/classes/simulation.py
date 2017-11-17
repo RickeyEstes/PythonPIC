@@ -286,7 +286,7 @@ class Simulation:
     def __eq__(self, other):
         return True # TODO: compare
 
-def load_simulation(filename: str) -> Simulation:
+def load_simulation(filename: str):
     """
     Create a Simulation object from a hdf5 file.
 
