@@ -104,7 +104,7 @@ class Simulation:
             species.save_particle_values(i)
             species.apply_bc()
 
-    def run(self, init=True) -> Simulation:
+    def run(self, init=True):
         """
         Run n iterations of the simulation, saving data as it goes.
 
