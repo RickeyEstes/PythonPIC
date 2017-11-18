@@ -4,8 +4,7 @@ import pandas as pd
 import pytest
 from matplotlib import pyplot as plt
 
-from pythonpic.algorithms.current_deposition import \
-    longitudinal_current_deposition, transversal_current_deposition
+from pythonpic.algorithms.current_deposition import current_deposition
 from pythonpic.classes import Particle, PeriodicTestGrid, NonperiodicTestGrid
 from pythonpic.classes import TestSpecies as Species
 from pythonpic.configs.run_laser import initial, npic, number_cells
@@ -43,7 +42,8 @@ def test_single_particle_longitudinal_deposition(_position, _velocity):
     g.current_density_x[...] = 0
     g.current_density_yz[...] = 0
     # current_deposition(g, s, dt)
-    longitudinal_current_deposition(g.current_density_x, s.v[:, 0], s.x, g.dx, dt, s.q)
+    current_deposition(g.current_density_x, g.current_density_yz, s.v,
+                       s.x, g.dx, dt, s.q)
     collected_longitudinal_weights = g.current_density_x.sum() / s.v[0, 0]
 
     def plot_longitudinal():
@@ -76,7 +76,8 @@ def test_single_particle_transversal_deposition(_position, _velocity):
     g.current_density_yz[...] = 0
     print("\n\n=====Start run===")
     # current_deposition(g, s, dt)
-    transversal_current_deposition(g.current_density_yz, s.v, s.x, g.dx, dt, s.q)
+    current_deposition(g.current_density_x, g.current_density_yz, s.v, s.x,
+                       g.dx, dt, s.q)
     total_currents = g.current_density_yz.sum(axis=0) / s.v[0, 1:]
     total_sum_currents = g.current_density_yz.sum()
     x_velocity = s.v[0, 0]
@@ -106,19 +107,6 @@ def test_single_particle_transversal_deposition(_position, _velocity):
     assert np.allclose(collected_transversal_weights, 1), plot_transversal()
     assert np.isclose(total_sum_currents, 0), (plot_transversal(), f"Currents do not zero out at {total_sum_currents}")
 
-
-def test_single_particle_above_lightspeed():
-    g = PeriodicTestGrid(1, L=7, NG=7)
-    s = Particle(g, 1 * g.dx, g.c * 4, g.c * 2)
-    dt = g.dx / s.c
-    g.current_density_x[...] = 0
-    g.current_density_yz[...] = 0
-    with pytest.raises(Exception):
-        longitudinal_current_deposition(g.current_density_x, s.v[:, 0], s.x, g.dx, dt, s.q)
-    with pytest.raises(Exception):
-        transversal_current_deposition(g.current_density_yz, s.v, s.x, g.dx, dt, s.q)
-
-
 def test_two_particles_deposition(_position, _velocity, _truefalse, _truefalse2):
     NG = 7
     L = NG
@@ -134,9 +122,13 @@ def test_two_particles_deposition(_position, _velocity, _truefalse, _truefalse2)
         # print(s.x)
         # print(s.v)
         if _truefalse:
-            longitudinal_current_deposition(g.current_density_x, s.v[:, 0], s.x, g.dx, dt, s.q)
+            current_deposition(g.current_density_x, g.current_density_yz,
+                               s.v, s.x, g.dx, dt,
+                               s.q)
         if _truefalse2:
-            transversal_current_deposition(g.current_density_yz, s.v, s.x, g.dx, dt, s.q)
+            current_deposition(g.current_density_x, g.current_density_yz, s.v,
+                               s.x, g.dx,
+                               dt, s.q)
         # print(g.current_density)
 
     collected_weights_x = g.current_density_x.sum(axis=0) / _velocity
@@ -153,9 +145,11 @@ def test_two_particles_deposition(_position, _velocity, _truefalse, _truefalse2)
     # print(s.x)
     # print(s.v)
     if _truefalse:
-        longitudinal_current_deposition(g2.current_density_x, s.v[:, 0], s.x, g2.dx, dt, s.q)
+        current_deposition(g2.current_density_x, g2.current_density_yz, s.v, s.x, g2.dx, \
+                                                       dt, s.q)
     if _truefalse2:
-        transversal_current_deposition(g2.current_density_yz, s.v, s.x, g2.dx, dt, s.q)
+        current_deposition(g2.current_density_x, g2.current_density_yz, s.v,
+                           s.x, g2.dx, dt, s.q)
     # print(g2.current_density)
     collected_weights_x2 = g2.current_density_x.sum(axis=0) / s.v[0, 0]
     collected_weights_yz2 = g2.current_density_yz.sum(axis=0) / np.array([1, -1], dtype=float)

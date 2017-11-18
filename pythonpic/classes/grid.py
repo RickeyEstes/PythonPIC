@@ -245,10 +245,10 @@ class Grid:
         self.current_density_x[...] = 0.0
         self.current_density_yz[...] = 0.0
         for species in list_species:
-            self.current_longitudinal_gather_function(self.current_density_x, species.v[:, 0], species.x, self.dx, self.dt,
-                                                      species.eff_q)
-            self.current_transversal_gather_function(self.current_density_yz, species.v, species.x, self.dx, self.dt,
-                                                     species.eff_q)
+            self.current_gather_function(self.current_density_x,
+                                         self.current_density_yz,
+                                         species.v, species.x,
+                                         self.dx, self.dt, species.eff_q)
 
     def field_function(self, xp):
         """
@@ -323,9 +323,9 @@ class PeriodicGrid(Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.charge_gather_function = charge_deposition.periodic_density_deposition
-        self.current_longitudinal_gather_function = current_deposition \
-            .periodic_longitudinal_current_deposition
-        self.current_transversal_gather_function = current_deposition.periodic_transversal_current_deposition
+        self.current_gather_function = current_deposition \
+            .periodic_current_deposition
+        self.current_gather_function = current_deposition.periodic_current_deposition
         self.particle_bc = BoundaryCondition.return_particles_to_bounds
         self.interpolator = field_interpolation.PeriodicInterpolateField
         self.periodic = True
@@ -354,8 +354,8 @@ class NonperiodicGrid(Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.charge_gather_function = charge_deposition.density_deposition
-        self.current_longitudinal_gather_function = current_deposition.aperiodic_longitudinal_current_deposition
-        self.current_transversal_gather_function = current_deposition.aperiodic_transversal_current_deposition
+        self.current_gather_function = current_deposition.aperiodic_current_deposition
+        self.current_gather_function = current_deposition.aperiodic_current_deposition
         self.particle_bc = BoundaryCondition.kill_particles_outside_bounds
         self.interpolator = field_interpolation.AperiodicInterpolateField
         self.periodic = False
