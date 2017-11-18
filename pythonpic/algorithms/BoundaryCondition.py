@@ -2,19 +2,6 @@
 
 import numpy as np
 
-
-def return_particles_to_bounds(species):
-    species.x %= species.grid.L
-
-
-def kill_particles_outside_bounds(species):
-    alive = (0 <= species.x) & (species.x < species.grid.L)
-    if species.N_alive:
-        species.x = species.x[alive]
-        species.v = species.v[alive]
-    species.N_alive = alive.sum()
-
-
 class BC:
     def __init__(self, index=0):
         self.index = index

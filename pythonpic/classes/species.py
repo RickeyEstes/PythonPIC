@@ -61,7 +61,8 @@ class Species:
     individual_diagnostics : bool
         Set to `True` to save particle position and velocity
     """
-    def __init__(self, q, m, N, grid, name="particles", scaling=1, pusher=rela_boris_push, individual_diagnostics=False):
+    def __init__(self, q, m, N, grid, name="particles", scaling=1,
+                 individual_diagnostics=False):
         self.q = q
         self.m = m
         self.N = int(N)
@@ -72,7 +73,6 @@ class Species:
 
         self.grid = grid
         self.grid.list_species.append(self)
-        self.particle_bc = grid.particle_bc
         self.dt = grid.dt
         self.NT = grid.NT
         self.c = grid.c
@@ -98,7 +98,6 @@ class Species:
         self.velocity_std_history = np.zeros((self.NT, 3), dtype=float)
         self.N_alive_history = np.zeros(self.NT, dtype=int)
         self.kinetic_energy_history = np.zeros(self.NT+1)
-        self.pusher = pusher
 
         self.postprocessed = False
 
@@ -133,9 +132,9 @@ class Species:
         group.attrs['postprocessed'] = self.postprocessed
     def apply_bc(self):
         """
-        Applies boundary conditions to particles.
+        Applies periodic boundary condition to particles.
         """
-        self.particle_bc(self) # TODO this is a really thin wrapper
+        self.x %= self.grid.L
 
     @property
     def gamma(self):
@@ -170,7 +169,7 @@ class Species:
 
     def velocity_push(self, field_function, time_multiplier=1):
         E, B = field_function(self.x)
-        self.energy = self.pusher(self, E, time_multiplier * self.dt, B)
+        self.energy = rela_boris_push(self, E, time_multiplier * self.dt, B)
 
     def position_push(self):
         self.x += self.v[:, 0] * self.dt
@@ -392,6 +391,18 @@ def load_species(f, grid):
         list_species.append(species)
     return list_species
 
+class NonPeriodicSpecies(Species):
+    def apply_bc(self):
+        """
+        Applies non-periodic (destructive) boundary conditions to Species
+        """
+        alive = (0 <= self.x) & (self.x < self.grid.L)
+        if self.N_alive:
+            self.x = self.x[alive]
+            self.v = self.v[alive]
+        self.N_alive = alive.sum()
+
+
 class TestSpecies(Species):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -419,7 +430,7 @@ class Particle(TestSpecies):
         x velocity
     vy : float
         y velocity
-    vz : float 
+    vz : float
         z velocity
     q : float
         particle charge
@@ -429,7 +440,7 @@ class Particle(TestSpecies):
         name of group
     scaling : float
         number of particles per macroparticle
-    pusher : function 
+    pusher : function
         particle push algorithm
     """
     def __init__(self, grid, x, vx, vy=0, vz=0, q=1, m=1, name="Test particle", scaling=1, pusher=rela_boris_push):
