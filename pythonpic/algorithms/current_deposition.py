@@ -64,7 +64,7 @@ def current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
 
         sign = particle_in_left_half.astype(int) * 2 - 1
         distance_to_current_cell_center = (logical_coordinates_n + 0.5) * dx - x_particles
-        s0 = (1 - sign * distance_to_current_cell_center / dx)
+        s0 = 1 - sign * distance_to_current_cell_center / dx
         change_in_coverage = sign * x_velocity * time_in_this_iteration / dx
         s1 = s0 + change_in_coverage
         w = 0.5 * (s0 + s1)
