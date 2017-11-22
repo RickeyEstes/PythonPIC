@@ -130,6 +130,7 @@ class Species:
         group.attrs['m'] = self.m
         group.attrs['scaling'] = self.scaling
         group.attrs['postprocessed'] = self.postprocessed
+
     def apply_bc(self):
         """
         Applies periodic boundary condition to particles.
@@ -390,6 +391,7 @@ def load_species(f, grid):
             species.postprocess()
         list_species.append(species)
     return list_species
+
 
 class NonPeriodicSpecies(Species):
     def apply_bc(self):

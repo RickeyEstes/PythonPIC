@@ -40,7 +40,6 @@ class Grid:
 
         self.c = c
         self.epsilon_0 = epsilon_0
-        self.particle_bc = lambda *x: None
         self.x, self.dx = np.linspace(0, L, NG, retstep=True, endpoint=False, dtype=np.float64)
         self.x_interpolation = np.arange(NG+2)*self.dx - self.dx
 
@@ -161,18 +160,15 @@ class Grid:
             self.perpendicular_energy_history = group["total_perpendicular"]
             self.grid_energy_history = group["total_grid"]
 
-    def apply_bc(self, i):
+    def apply_bc(self, *args, **kwargs):
         """
-        Applies boundary conditions at a given iteration, modifying fields in
-        place.
-
-        Parameters
-        ----------
-        i : int
-            Iteration numbed
+        For a periodic grid, does nothing.
         """
-        self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
+
+    def apply_particle_bc(self,  *args, **kwargs):
+        pass
+        
 
     def init_solve(self, neutralize = False):
         """
@@ -198,13 +194,12 @@ class Grid:
 
         """
         BunemanLongitudinalSolver(self.electric_field, self.current_density_x,
-                                                              self.dt,
-                                                              self.epsilon_0,
-                                                              )
+                                  self.dt,
+                                  self.epsilon_0,)
         BunemanTransversalSolver(self.electric_field,
-                                       self.magnetic_field,
-                                       self.current_density_yz, self.dt,
-                                       self.c, self.epsilon_0)
+                                 self.magnetic_field,
+                                 self.current_density_yz, self.dt,
+                                 self.c, self.epsilon_0)
 
     def direct_energy_calculation(self):
         r"""
@@ -359,6 +354,19 @@ class NonperiodicGrid(Grid):
         self.particle_bc = BoundaryCondition.kill_particles_outside_bounds
         self.interpolator = field_interpolation.AperiodicInterpolateField
         self.periodic = False
+
+    def apply_bc(self, i):
+        """
+        Applies boundary conditions at a given iteration, modifying fields in
+        place.
+
+        Parameters
+        ----------
+        i : int
+            Iteration numbed
+        """
+        self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
+        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
 
 class PeriodicTestGrid(PeriodicGrid):
