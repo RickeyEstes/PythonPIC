@@ -7,7 +7,8 @@ from scipy.integrate import cumtrapz, trapz
 
 from ..helper_functions import physics
 from ..algorithms import charge_deposition, FieldSolver, BoundaryCondition, \
-    current_deposition, field_interpolation
+    field_interpolation
+from ..algorithms.current_deposition import import current_deposition
 from ..algorithms.FieldSolver import (BunemanLongitudinalSolver,
                                     BunemanTransversalSolver,
                                     FourierLongitudinalSolver)
@@ -240,10 +241,10 @@ class Grid:
         self.current_density_x[...] = 0.0
         self.current_density_yz[...] = 0.0
         for species in list_species:
-            self.current_gather_function(self.current_density_x,
-                                         self.current_density_yz,
-                                         species.v, species.x,
-                                         self.dx, self.dt, species.eff_q)
+            current_deposition(self.current_density_x,
+                               self.current_density_yz,
+                               species.v, species.x,
+                               self.dx, self.dt, species.eff_q)
 
     def field_function(self, xp):
         """
@@ -325,6 +326,15 @@ class PeriodicGrid(Grid):
         self.interpolator = field_interpolation.PeriodicInterpolateField
         self.periodic = True
 
+    def gather_current(self, list_species):
+        super().gather_current(list_species)
+        self.current_density_yz[-4:-2] += self.current_density_yz[:2]
+        self.current_density_yz[2:4] += self.current_density_yz[-2:]
+        self.current_density_x[-3] += self.current_density_x[0]
+        self.current_density_x[0] = 0
+        self.current_density_x[1:3] += self.current_density_x[-2:]
+        self.current_density_x[-2:] = 0
+
 
 class NonperiodicGrid(Grid):
     """
@@ -367,6 +377,13 @@ class NonperiodicGrid(Grid):
         """
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
+
+    def gather_current(self, list_species):
+        super().gather_current(list_species)
+        self.current_density_yz[:2] = 0
+        self.current_density_yz[-2:] = 0
+        self.current_density_x[0] = 0
+        self.current_density_x[-2:] = 0
 
 
 class PeriodicTestGrid(PeriodicGrid):

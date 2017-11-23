@@ -1,23 +1,5 @@
 # coding=utf-8
 import numpy as np
-# from numba import jit # TODO
-
-def aperiodic_current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
-    current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q)
-    j_yz[:2] = 0
-    j_yz[-2:] = 0
-    j_x[0] = 0
-    j_x[-2:] = 0
-
-# @jit()
-def periodic_current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
-    current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q)
-    j_yz[-4:-2] += j_yz[:2]
-    j_yz[2:4] += j_yz[-2:]
-    j_x[-3] += j_x[0]
-    j_x[0] = 0
-    j_x[1:3] += j_x[-2:]
-    j_x[-2:] = 0
 
 def current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
     epsilon = dx * 1e-10
