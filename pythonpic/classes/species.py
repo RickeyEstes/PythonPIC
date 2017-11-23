@@ -131,12 +131,6 @@ class Species:
         group.attrs['scaling'] = self.scaling
         group.attrs['postprocessed'] = self.postprocessed
 
-    def apply_bc(self):
-        """
-        Applies periodic boundary condition to particles.
-        """
-        self.x %= self.grid.L
-
     @property
     def gamma(self):
         """
@@ -178,8 +172,7 @@ class Species:
     def gather_density(self):
         """A wrapper function to facilitate gathering particle density onto the grid.
         """
-        self.gathered_density = self.grid.charge_gather_function(self.grid.x, self.grid.dx, self.x)
-        return self.gathered_density
+        self.gathered_density = self.grid.gather_density(self)
     """POSITION INITIALIZATION"""
 
     def distribute_uniformly(self, Lx: float, shift: float = 0, start_moat=0, end_moat=0):
@@ -208,7 +201,6 @@ class Species:
         self.x = density_profiles.generate(dense_x, density_profiles.FDENS, moat_length,
                                            ramp_length,
                                            plasma_length, self.N, profile)
-        self.apply_bc()
 
     def sinusoidal_position_perturbation(self, amplitude: float, mode: int):
         """
@@ -225,7 +217,6 @@ class Species:
 
         """
         self.x += amplitude * np.cos(2 * mode * np.pi * self.x / self.grid.L) # TODO: remove 2*
-        self.apply_bc()
 
     def random_position_perturbation(self, std: float):
         """
@@ -240,7 +231,6 @@ class Species:
 
         """
         self.x += np.random.normal(scale=std*self.grid.dx, size=self.N)
-        self.apply_bc()
 
     def random_velocity_init(self, amplitude: float):
         random_theta = np.random.random(size=self.N) * 2 * np.pi
@@ -393,17 +383,6 @@ def load_species(f, grid):
     return list_species
 
 
-class NonPeriodicSpecies(Species):
-    def apply_bc(self):
-        """
-        Applies non-periodic (destructive) boundary conditions to Species
-        """
-        alive = (0 <= self.x) & (self.x < self.grid.L)
-        if self.N_alive:
-            self.x = self.x[alive]
-            self.v = self.v[alive]
-        self.N_alive = alive.sum()
-
 
 class TestSpecies(Species):
     def __init__(self, *args, **kwargs):
@@ -445,9 +424,10 @@ class Particle(TestSpecies):
     pusher : function
         particle push algorithm
     """
-    def __init__(self, grid, x, vx, vy=0, vz=0, q=1, m=1, name="Test particle", scaling=1, pusher=rela_boris_push):
+    def __init__(self, grid, x, vx, vy=0, vz=0, q=1, m=1, name="Test particle", scaling=1):
         # noinspection PyArgumentEqualDefault
-        super().__init__(q, m, 1, grid, name, scaling = scaling, pusher=pusher, individual_diagnostics=True)
+        super().__init__(q, m, 1, grid, name, scaling = scaling,
+                         individual_diagnostics=True)
         self.x[:] = x
         self.v[:, 0] = vx
         self.v[:, 1] = vy

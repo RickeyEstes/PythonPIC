@@ -78,7 +78,7 @@ class Simulation:
         self.grid.init_solve()
         for species in self.list_species:
             species.position_push()
-            species.apply_bc()
+            self.grid.apply_particle_bc(species)
         return self
 
     def iteration(self, i: int):
@@ -102,7 +102,7 @@ class Simulation:
         for species in self.list_species:
             species.position_push()
             species.save_particle_values(i)
-            species.apply_bc()
+            self.grid.apply_particle_bc(species)
 
     def run(self, init=True):
         """

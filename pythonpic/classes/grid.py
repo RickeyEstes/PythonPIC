@@ -6,12 +6,12 @@ import scipy.fftpack as fft
 from scipy.integrate import cumtrapz, trapz
 
 from ..helper_functions import physics
-from ..algorithms import charge_deposition, FieldSolver, BoundaryCondition, \
+from ..algorithms import FieldSolver, BoundaryCondition, \
     field_interpolation
-from ..algorithms.current_deposition import import current_deposition
+from ..algorithms.current_deposition import current_deposition
 from ..algorithms.FieldSolver import (BunemanLongitudinalSolver,
-                                    BunemanTransversalSolver,
-                                    FourierLongitudinalSolver)
+                                      BunemanTransversalSolver,
+                                      FourierLongitudinalSolver)
 
 
 class Grid:
@@ -161,15 +161,15 @@ class Grid:
             self.perpendicular_energy_history = group["total_perpendicular"]
             self.grid_energy_history = group["total_grid"]
 
-    def apply_bc(self, *args, **kwargs):
+    def apply_bc(self, i, *args, **kwargs):
         """
         For a periodic grid, does nothing.
         """
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
-    def apply_particle_bc(self,  *args, **kwargs):
-        pass
-        
+    def apply_particle_bc(self, species):
+        species.x %= self.L
+
 
     def init_solve(self, neutralize = False):
         """
@@ -212,6 +212,16 @@ class Grid:
         """
         return self.epsilon_0 * (self.electric_field ** 2).sum() * 0.5
 
+    def gather_density(self, species):
+        logical_coordinates = (species.x / self.dx).astype(int)
+        charge_to_right = species.x / self.dx - logical_coordinates
+        charge_to_left = 1 - charge_to_right
+        charge_hist_to_right = np.bincount(logical_coordinates+1, charge_to_right, minlength=self.NG+1)
+        charge_hist_to_left = np.bincount(logical_coordinates, charge_to_left,
+                                          minlength=self.NG+1)
+        return charge_hist_to_right + charge_hist_to_left
+
+
     def gather_charge(self, list_species, force_periodic=False):
         """
         Gathers charge onto the Eulerian grid.
@@ -225,7 +235,7 @@ class Grid:
         """
         self.charge_density[...] = 0.0
         for species in list_species:
-            self.charge_density += species.gather_density() * species.eff_q
+            self.charge_density += self.gather_density(species) * species.eff_q
         if self.periodic and force_periodic:
             self.charge_density -= self.charge_density.mean()
 
@@ -318,11 +328,6 @@ class PeriodicGrid(Grid):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.charge_gather_function = charge_deposition.periodic_density_deposition
-        self.current_gather_function = current_deposition \
-            .periodic_current_deposition
-        self.current_gather_function = current_deposition.periodic_current_deposition
-        self.particle_bc = BoundaryCondition.return_particles_to_bounds
         self.interpolator = field_interpolation.PeriodicInterpolateField
         self.periodic = True
 
@@ -358,10 +363,6 @@ class NonperiodicGrid(Grid):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.charge_gather_function = charge_deposition.density_deposition
-        self.current_gather_function = current_deposition.aperiodic_current_deposition
-        self.current_gather_function = current_deposition.aperiodic_current_deposition
-        self.particle_bc = BoundaryCondition.kill_particles_outside_bounds
         self.interpolator = field_interpolation.AperiodicInterpolateField
         self.periodic = False
 
@@ -378,13 +379,27 @@ class NonperiodicGrid(Grid):
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
         self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
+    def apply_particle_bc(self, species):
+        """
+        Applies non-periodic (destructive) boundary conditions to Species
+        """
+        alive = (0 <= species.x) & (species.x < self.L)
+        if species.N_alive:
+            species.x = species.x[alive]
+            species.v = species.v[alive]
+        species.N_alive = alive.sum()
+
+    def gather_density(self, species):
+        result = super().gather_density(species)
+        result[0] += result[-1]
+        return result
+
     def gather_current(self, list_species):
         super().gather_current(list_species)
         self.current_density_yz[:2] = 0
         self.current_density_yz[-2:] = 0
         self.current_density_x[0] = 0
         self.current_density_x[-2:] = 0
-
 
 class PeriodicTestGrid(PeriodicGrid):
     def __init__(self, *args, **kwargs):

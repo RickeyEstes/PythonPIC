@@ -21,11 +21,6 @@ def _n_particles(request):
     return request.param
 
 
-@pytest.fixture(params=[particle_push.boris_push])
-def _pusher(request):
-    return request.param
-
-
 @pytest.fixture(params=np.linspace(0.1, 0.9, 10))
 def _v0(request):
     return request.param
@@ -66,30 +61,6 @@ def plot(t, analytical_result, simulation_result,
         ax.set_xticks(t)
     plt.show()
     return message
-
-
-def test_constant_field(g, _pusher, _n_particles):
-    """Tests non-relativistic movement in constant electric field along the
-    direction of motion. The particle should accelerate uniformly."""
-    s = Species(1, 1, _n_particles, g, pusher=_pusher,
-                individual_diagnostics=True)
-    t = np.arange(0, g.T, g.dt * s.save_every_n_iterations) - g.dt / 2
-
-    def uniform_field(*args, **kwargs):
-        return np.array([[1, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float)
-
-    x_analytical = 0.5 * (t + g.dt / 2) ** 2 + 0
-    s.velocity_push(uniform_field, -0.5)
-    for i in range(g.NT):
-        s.save_particle_values(i)
-        s.velocity_push(uniform_field)
-        s.position_push()
-
-    s.save_particle_values(g.NT-1)
-    assert np.allclose(s.position_history[:, 0], x_analytical, atol=atol, rtol=rtol), \
-        plot(t, x_analytical, s.position_history[:, 0])
-    return Simulation(g, [s])
-
 
 def test_relativistic_constant_field(g, _n_particles):
     """Tests relativistic movement in constant electric field along the
@@ -248,7 +219,7 @@ def test_periodic_particles(g):
         force = lambda x: (np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float))
         s.velocity_push(force)
         s.position_push()
-        s.apply_bc()
+        g.apply_particle_bc(s)
     assert s.N_alive == s.N, "They're dead, Jim."
 
 def test_nonperiodic_particles(g_aperiodic):
@@ -262,7 +233,7 @@ def test_nonperiodic_particles(g_aperiodic):
         force = lambda x: (np.array([[0, 0, 0]], dtype=float), np.array([[0, 0, 0]], dtype=float))
         s.velocity_push(force)
         s.position_push()
-        s.apply_bc()
+        g.apply_particle_bc(s)
     assert s.N_alive == 0
 
 
