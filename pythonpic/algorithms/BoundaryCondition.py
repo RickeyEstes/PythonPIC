@@ -73,8 +73,7 @@ class Laser(BC):
         self.envelope_width = envelope_width
         self.envelope_power = envelope_power
         self.laser_intensity = laser_intensity
-        # import ipdb; ipdb.set_trace()
-        wave_impedance = 1/ (epsilon_0 * c)
+        wave_impedance = 1 / (epsilon_0 * c)
         self.laser_amplitude = np.sqrt(self.laser_intensity * wave_impedance)
         t_12 = envelope_center_t
         self._taui = 0.5 / np.log(2)**(1/envelope_power) * t_12
@@ -98,14 +97,13 @@ class Laser(BC):
         return self.laser_amplitude * self.wave_func(t)
 
     def envelope_func(self, t):
-        return np.exp(-((t - self._t_0) / self._tau)** self.envelope_power)
+        return np.exp(-((t - self._t_0) / self._tau) ** self.envelope_power)
 
     def laser_envelope(self, t):
         return self.laser_amplitude * self.envelope_func(t)
 
     def laser_pulse(self, t):
         return self.laser_wave(t) * self.envelope_func(t)
-
 
 
 class LaserEy(Laser):
@@ -118,6 +116,7 @@ class LaserEy(Laser):
     def B_values(self, t):
         return 0, 0, self.bc_function(t) / self.c
 
+
 class LaserEz(Laser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -128,6 +127,7 @@ class LaserEz(Laser):
     def B_values(self, t):
         return 0, self.bc_function(t) / self.c, 0
 
+
 class LaserCircular(Laser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -137,13 +137,14 @@ class LaserCircular(Laser):
         return 2 * np.pi / self.laser_wavelength * self.c * t
 
     def E_values(self, t):
-        bc = self.bc_function(t) * 2 **-0.5
+        bc = self.bc_function(t) * 2 ** -0.5
         phase = self.polarisation_phase(t)
         return 0, bc * np.cos(phase), bc * np.sin(phase)
 
     def B_values(self, t):
-        bc = self.bc_function(t) / self.c * 2 **-0.5
+        bc = self.bc_function(t) / self.c * 2 ** -0.5
         phase = self.polarisation_phase(t)
         return 0, bc * np.sin(phase), bc * np.cos(phase)
+
 
 bcs = {"Ey": LaserEy, "Ez": LaserEz, "Circular": LaserCircular}
