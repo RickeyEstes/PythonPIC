@@ -104,6 +104,27 @@ class Simulation:
             species.save_particle_values(i)
             self.grid.apply_particle_bc(species)
 
+    def iteration_lite(self, i: int):
+        """
+
+        :param int i: iteration number
+        Runs an iteration step
+        1. saves field values
+        2. for all particles:
+            2. 1. saves particle values
+            2. 2. pushes particles forward
+
+        """
+        self.grid.apply_bc(i)
+        for species in self.list_species:
+            species.velocity_push(self.grid.field_function) # TODO should be inplace?
+        self.grid.gather_charge(self.list_species)
+        self.grid.gather_current(self.list_species)
+        self.grid.solve()
+        for species in self.list_species:
+            species.position_push()
+            self.grid.apply_particle_bc(species)
+
     def run(self, init=True):
         """
         Run n iterations of the simulation, saving data as it goes.
@@ -142,6 +163,31 @@ class Simulation:
             print("Simulation interrupted. Removing data.")
             os.remove(self.filename)
             exit()
+
+    def run_lite(self, init=True):
+        """
+        Run n iterations of the simulation, saving data as it goes.
+
+        Also measures runtime, saving it in self.runtime as a float with units of seconds.
+
+        Parameters
+        ----------
+        init : bool
+            Whether or not to initialize the simulation (particle placement, grid interaction).
+            Not necessary, for example, in some tests.
+
+        Returns
+        -------
+        self: Simulation
+            The simulation, for chaining purposes.
+        """
+        if init:
+            self.grid_species_initialization()
+        start_time = time.time()
+        for i in range(self.NT):
+            self.iteration_lite(i)
+        self.runtime = time.time() - start_time
+        return self.runtime
 
     def lazy_run(self):
         """Does a simulation run() unless there's already a saved data with that file.

@@ -8,7 +8,7 @@ from pythonpic.helper_functions.physics import epsilon_zero, electric_charge, li
 
 VERSION = 32
 laser_wavelength = 1.064e-6 # meters
-laser_intensity = 1e23 # watt/meters squared
+laser_intensity = 1e21 # watt/meters squared
 impulse_duration = 1e-13 # seconds
 
 length = 1.0655e-5 # meters
@@ -34,11 +34,13 @@ N_MACROPARTICLES = int(maximum_electron_concentration * 1.5 * preplasma_length /
 n_macroparticles = N_MACROPARTICLES
 scaling = npic
 
-category_name = "laser-shield"
+laser_polarization = "Ez"
+individual_diagnostics = False
+
+category_name = "benchmark_run"
 # assert False
 class initial(Simulation):
-    def __init__(self, filename, n_macroparticles, n_cells, impulse_duration, laser_intensity, perturbation_amplitude,
-                 laser_polarization="Ez", individual_diagnostics=False):
+    def __init__(self, filename, n_macroparticles, n_cells):
         """
         A simulation of laser-hydrogen shield interaction.
 
@@ -87,9 +89,7 @@ class initial(Simulation):
         else:
             list_species = []
 
-        self.perturbation_amplitude = perturbation_amplitude # in units of dx
-
-        description = "Hydrogen shield-laser interaction"
+        description = "Benchmark run for laser interaction"
 
         super().__init__(grid, list_species,
                          filename=filename,
@@ -102,9 +102,8 @@ class initial(Simulation):
     def grid_species_initialization(self):
         for species in self.list_species:
             print(f"Distributing {species.name} nonuniformly.")
-            species.distribute_nonuniformly(moat_length_left_side,
-                                            preplasma_length, main_plasma_length,
-                                            profile="exponential")
+            species.distribute_uniformly(self.grid.L, 0,
+                                         moat_length_left_side, moat_length_left_side)
         print("Finished initial distribution of particles.")
         super().grid_species_initialization()
         print("Finished initialization.")

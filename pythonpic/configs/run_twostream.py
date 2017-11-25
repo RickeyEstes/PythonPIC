@@ -74,7 +74,7 @@ class initial(Simulation):
         for i, species in enumerate(self.list_species):
             species.distribute_uniformly(self.grid.L, 0.5 * self.grid.dx * i)
             species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode)
-            species.apply_bc()
+            self.grid.apply_particle_bc(species)
             if self.vrandom:
                 species.random_velocity_perturbation(0, self.vrandom)
 

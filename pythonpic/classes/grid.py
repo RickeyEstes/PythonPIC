@@ -165,7 +165,7 @@ class Grid:
         """
         For a periodic grid, does nothing.
         """
-        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
+        pass
 
     def apply_particle_bc(self, species):
         species.x %= self.L
@@ -294,6 +294,7 @@ class Grid:
         self.current_density_history[i, :, 1:] = self.current_density_yz[2:-2]
         self.electric_field_history[i] = self.electric_field[1:-1]
         self.magnetic_field_history[i] = self.magnetic_field[1:-1]
+        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
     def __repr__(self):
         return f"Grid(T={self.T}, L={self.L}, NG={self.NG}, c={self.c}," \
@@ -377,7 +378,6 @@ class NonperiodicGrid(Grid):
             Iteration numbed
         """
         self.bc.apply(self.electric_field, self.magnetic_field, i * self.dt)
-        self.laser_energy_history[i] = np.sqrt(np.sum(self.electric_field[self.bc.index, 1:]**2))
 
     def apply_particle_bc(self, species):
         """
