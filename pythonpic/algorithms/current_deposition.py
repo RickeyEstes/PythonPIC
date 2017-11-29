@@ -1,9 +1,6 @@
 # coding=utf-8
 import numpy as np
-from numba import jit
 
-
-@jit("void(f8[:],f8[:,:],f8[:,:],f8[:],f8,f8,f8)")
 def current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
     epsilon = dx * 1e-10
     time = np.ones_like(x_particles) * dt
