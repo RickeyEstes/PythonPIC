@@ -63,7 +63,7 @@ class Simulation:
         # TODO: this doesn't save
         return self
 
-    def grid_species_initialization(self):
+    def grid_species_initialization(self, init_solve=True):
         """
         Initializes grid and particle relations:
         1. gathers charge from particles to grid
@@ -75,7 +75,6 @@ class Simulation:
             species.velocity_push(self.grid.field_function, -0.5)
         self.grid.gather_charge(self.list_species)
         self.grid.gather_current(self.list_species)
-        self.grid.init_solve()
         for species in self.list_species:
             species.position_push()
             self.grid.apply_particle_bc(species)
@@ -164,7 +163,7 @@ class Simulation:
             os.remove(self.filename)
             exit()
 
-    def run_lite(self, init=True):
+    def run_lite(self):
         """
         Run n iterations of the simulation, saving data as it goes.
 
@@ -181,8 +180,7 @@ class Simulation:
         self: Simulation
             The simulation, for chaining purposes.
         """
-        if init:
-            self.grid_species_initialization()
+        self.grid_species_initialization()
         start_time = time.time()
         for i in range(self.NT):
             self.iteration_lite(i)

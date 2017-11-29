@@ -360,7 +360,6 @@ def load_species(f, grid):
         scaling = species_data.attrs['scaling']
         postprocessed = species_data.attrs['postprocessed']
 
-
         species = Species(q, m, N, grid, name, scaling, individual_diagnostics=False)
         species.velocity_mean_history = species_data["v_mean"]
         species.velocity_squared_mean_history = species_data["v2_mean"]

@@ -1,10 +1,13 @@
 # coding=utf-8
 import numpy as np
+from numba import jit
 
+
+@jit("void(f8[:],f8[:,:],f8[:,:],f8[:],f8,f8,f8)")
 def current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
     epsilon = dx * 1e-10
     time = np.ones_like(x_particles) * dt
-    active = np.any(velocity,axis=1)
+    active = np.any(velocity, axis=1)
 
     while active.any():
         logical_coordinates_n = (x_particles // dx).astype(np.int32)
@@ -58,8 +61,7 @@ def current_deposition(j_x, j_yz, velocity, x_particles, dx, dt, q):
         y_contribution_to_next_cell = (1 - w) * j_contribution[:,1]
         z_contribution_to_next_cell = (1 - w) * j_contribution[:,2]
 
-        j_x += np.bincount(logical_coordinates_long + 1, j_contribution[:,0],
-                           minlength=j_x.size)
+        j_x += np.bincount(logical_coordinates_long + 1, j_contribution[:,0], minlength=j_x.size)
         j_yz[:, 0] += np.bincount(logical_coordinates_n + 2, y_contribution_to_current_cell, minlength=j_yz[:, 1].size)
         j_yz[:, 1] += np.bincount(logical_coordinates_n + 2, z_contribution_to_current_cell, minlength=j_yz[:, 1].size)
 

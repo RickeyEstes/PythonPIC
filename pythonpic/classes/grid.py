@@ -171,7 +171,7 @@ class Grid:
         species.x %= self.L
 
 
-    def init_solve(self, neutralize = False):
+    def init_solve(self, neutralize=False):
         """
         Performs the initial, spectral iteration of the field solver.
         See `FieldSolver` for details.
@@ -181,9 +181,9 @@ class Grid:
             )
 
         BunemanTransversalSolver(self.electric_field,
-                                        self.magnetic_field,
-                                        self.current_density_yz, self.dt,
-                                        self.c, self.epsilon_0)
+                                 self.magnetic_field,
+                                 self.current_density_yz, self.dt,
+                                 self.c, self.epsilon_0)
 
 
     def solve(self):
@@ -340,6 +340,12 @@ class PeriodicGrid(Grid):
         self.current_density_x[0] = 0
         self.current_density_x[1:3] += self.current_density_x[-2:]
         self.current_density_x[-2:] = 0
+
+    def __repr__(self):
+        return "Periodic" + super().__repr__();
+
+    def __str__(self):
+        return "Periodic " + super().__str__();
 
 
 class NonperiodicGrid(Grid):

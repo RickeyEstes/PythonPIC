@@ -84,5 +84,6 @@ class initial(Simulation):
         for species in self.list_species:
             species.distribute_uniformly(self.grid.L)
             species.sinusoidal_position_perturbation(self.push_amplitude, self.push_mode)
+            self.grid.apply_particle_bc(species)
         super().grid_species_initialization()
 

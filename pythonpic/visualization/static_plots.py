@@ -196,7 +196,6 @@ def position_trajectories(S, axis, species_index, n_particle = "half"):
     species = S.list_species[species_index]
     if n_particle == "half":
         n_particle = int(species.N/2)
-    axis.set_title("Phase space plot")
     y = species.position_history[:, n_particle]
     x = species.save_every_n_iterations * S.dt * np.arange(y.size)
     axis.set_title(f"Trajectory for particle {n_particle} / {species.N}")
@@ -212,7 +211,6 @@ def velocity_trajectories(S, axis, species_index, n_particle = "half", direction
     species = S.list_species[species_index]
     if n_particle == "half":
         n_particle = int(species.N/2)
-    axis.set_title("Phase space plot")
     y = species.velocity_history[:, n_particle, direction]
     x = species.save_every_n_iterations * S.dt * np.arange(y.size)
     axis.set_title(f"Velocity history for particle {n_particle} / {species.N}")
@@ -231,11 +229,10 @@ def velocity_time_plots(S, axis):
             mean = s.velocity_mean_history[:, i]
             std = s.velocity_std_history[:, i]
             axis.plot(S.grid.t, mean, "-", color=colors[i], label=f"{s.name} $v_{directions[i]}$", alpha=1)
-            axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
+            axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3, label=f"{s.name} $\sigma v_{directions[i]}$")
     axis.set_xlabel(r"Time $t$ [s]")
-    axis.set_ylabel(r"Velocity $v$ [m/s]")
-    if len(S.list_species) > 1:
-        axis.legend(loc='best')
+    axis.set_ylabel(r"$<v> \pm 1 \sigma$ [m/s]")
+    axis.legend(loc='best')
     axis.grid()
     axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 
@@ -245,11 +242,10 @@ def directional_velocity_time_plots(S, axis, j):
         mean = s.velocity_mean_history[:, j]
         std = s.velocity_std_history[:, j]
         axis.plot(S.grid.t, mean, "-", color=colors[i], label=f"{s.name} $v_{directions[j]}$", alpha=1)
-        axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3)
-    axis.set_xlabel(r"Time $t$")
-    axis.set_ylabel(r"Avg. vel. $<v> \pm 1 $ std [m/s]")
-    if len(S.list_species) > 1:
-        axis.legend(loc='best')
+        axis.fill_between(S.grid.t, mean - std, mean + std, color=colors[i], alpha=0.3, label=f"{s.name} $\sigma v_{directions[i]}$")
+    axis.set_xlabel(r"Time $t$ [s]")
+    axis.set_ylabel(r"$<v> \pm 1 \sigma$ [m/s]")
+    axis.legend(loc='best')
     axis.grid()
     axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
 

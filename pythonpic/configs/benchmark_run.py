@@ -93,7 +93,7 @@ class initial(Simulation):
 
         super().__init__(grid, list_species,
                          filename=filename,
-                         category_type="laser-shield",
+                         category_type="benchmark",
                          config_version=VERSION,
                          title=description,
                          considered_large = True)
@@ -105,6 +105,6 @@ class initial(Simulation):
             species.distribute_uniformly(self.grid.L, 0,
                                          moat_length_left_side, moat_length_left_side)
         print("Finished initial distribution of particles.")
-        super().grid_species_initialization()
+        super().grid_species_initialization(False)
         print("Finished initialization.")
 

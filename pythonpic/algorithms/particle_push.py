@@ -1,7 +1,7 @@
 # coding=utf-8
 """mathematical algorithms for the particle pusher, Leapfrog and Boris"""
 import numpy as np
-from numba import jit
+from numba import jit, njit
 
 @jit()
 def boris_velocity_kick(v, eff_q, E, B, dt, eff_m):
@@ -46,8 +46,7 @@ def boris_velocity_kick(v, eff_q, E, B, dt, eff_m):
     v[:] = v_new
     return energy
 
-
-@jit()
+@jit("f8(f8[:,:],f8,f8,f8[:,:],f8[:,:],f8,f8)")
 def rela_boris_velocity_kick(v, c, eff_q, E, B, dt, eff_m):
     """
     The velocity update portion of the Boris pusher. Updates the velocity in place so as to conserve memory.
