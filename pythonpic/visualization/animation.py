@@ -120,7 +120,8 @@ class Animation:
             helpers.make_sure_path_exists(self.S.filename)
             file_name = self.S.filename.replace(".hdf5", f"_{i:06}.png")
             print(f"Saving iteration {i} to {file_name}")
-            self.fig.savefig(file_name)
+            self.fig.savefig(file_name, dpi=1200)
+            self.fig.savefig(file_name.replace('.png', '.pdf'), dpi=1200)
         return self.fig
 
 class FullAnimation(Animation):

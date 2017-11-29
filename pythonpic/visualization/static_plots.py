@@ -29,9 +29,9 @@ def static_plot_window(S, N, M):
     fig = plt.figure(figsize=(10, 8))
     gs = gridspec.GridSpec(N, M)
     axes = [[fig.add_subplot(gs[n, m]) for m in range(M)] for n in range(N)]
-    fig.suptitle(str(S), fontsize=12)
+    fig.suptitle(str(S), fontsize=11)
 
-    gs.update(left=0.075, right=0.95, bottom=0.075, top=0.8, hspace=0.45, wspace=0.25)  # , wspace=0.05, hspace=0.05
+    gs.update(left=0.075, right=0.98, bottom=0.075, top=0.8, hspace=0.45, wspace=0.25)  # , wspace=0.05, hspace=0.05
     return fig, axes
 
 
@@ -198,7 +198,7 @@ def position_trajectories(S, axis, species_index, n_particle = "half"):
         n_particle = int(species.N/2)
     y = species.position_history[:, n_particle]
     x = species.save_every_n_iterations * S.dt * np.arange(y.size)
-    axis.set_title(f"Trajectory for particle {n_particle} / {species.N}")
+    axis.set_title(f"$x(t)$ for part. {n_particle} / {species.N}")
     axis.plot(x, y, ".--", label=species.name)
     if len(S.list_species) > 1:
         axis.legend(loc='best')
@@ -213,7 +213,7 @@ def velocity_trajectories(S, axis, species_index, n_particle = "half", direction
         n_particle = int(species.N/2)
     y = species.velocity_history[:, n_particle, direction]
     x = species.save_every_n_iterations * S.dt * np.arange(y.size)
-    axis.set_title(f"Velocity history for particle {n_particle} / {species.N}")
+    axis.set_title(f"$v_{directions[direction]}(t)$ for part. {n_particle} / {species.N}")
     axis.plot(x, y, ".--", label=species.name)
     if len(S.list_species) > 1:
         axis.legend(loc='best')
@@ -261,7 +261,7 @@ def total_velocity_time_plots(S, axis):
     if len(S.list_species) > 1:
         axis.legend(loc='best')
     axis.grid()
-    axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=False)
+    axis.ticklabel_format(style='sci', axis='both', scilimits=(0, 0), useMathText=True, useOffset=True)
 
 def static_plots(S, filename=None):
     print(S.grid)
@@ -283,7 +283,8 @@ def static_plots(S, filename=None):
     # axes[2][1].yaxis.set_label_position("right")
 
     if filename:
-        time_fig.savefig(filename)
+        time_fig.savefig(filename, dpi=1200)
+        time_fig.savefig(filename.replace('.png', '.pdf'), dpi=1200)
     return time_fig
 
 def electrostatic_static_plots(S, filename=None):
@@ -305,7 +306,8 @@ def electrostatic_static_plots(S, filename=None):
     #     axes[i][1].yaxis.set_label_position("right")
 
     if filename:
-        time_fig.savefig(filename)
+        time_fig.savefig(filename, dpi=1200)
+        time_fig.savefig(filename.replace('.png', '.pdf'), dpi=1200)
     return time_fig
 def static_plots_large(S, filename=None):
     if filename and not os.path.exists(os.path.dirname(filename)):
@@ -323,7 +325,8 @@ def static_plots_large(S, filename=None):
 
 
     if filename:
-        time_fig.savefig(filename)
+        time_fig.savefig(filename, dpi=1200)
+        time_fig.savefig(filename.replace('.png', '.pdf'), dpi=1200)
     return time_fig
 
 def publication_plots(S, filename, list_plots):

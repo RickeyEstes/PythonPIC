@@ -15,6 +15,5 @@ for power, number_particles, n_cells, polarization in [
     intensity = 10**power
     s = initial(f"{number_particles}_{n_cells}_run_{power}_{polarization}", number_particles, n_cells, impulse_duration,
                 intensity, perturbation_amplitude,
-                laser_polarization=polarization).lazy_run().plots_3d(*args)
-        # frames="few")
+                laser_polarization=polarization).lazy_run().plots_3d(*args, frames="few")
     del s
