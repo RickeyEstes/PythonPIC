@@ -26,5 +26,4 @@ for polarization in polarizations:
         # [150000, int(number_cells*4)], #
         ]:
         s = initial(f"{number_particles}_{n_cells}_run_{power}_{polarization}", number_particles, n_cells, impulse_duration,
-                    intensity, perturbation_amplitude=0, individual_diagnostics=True, laser_polarization=polarization).lazy_run()
-        s.plots_3d(True, False, True, False)
+                    intensity, perturbation_amplitude=0, individual_diagnostics=True, laser_polarization=polarization).lazy_run().plots_3d(*args)

@@ -14,4 +14,4 @@ for intensity in intensities:
                     impulse_duration,
                     intensity,
                     perturbation_amplitude,
-                    scaling).lazy_run()
+                    scaling).lazy_run().plots_3d(*args)
